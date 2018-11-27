@@ -41,13 +41,13 @@ class Main_Menu extends Engine {
         let ambientLight = new THREE.AmbientLight("#525252");
         this.scene.add(ambientLight);
 
-        window.addEventListener("resize", this.onWindowResize, false);
+        window.addEventListener("resize", this.onWindowResize.bind(this), false);
 
         this.raycaster = new THREE.Raycaster();
         let INTERSECTED;
 
-        document.addEventListener("mousedown", this.onDocumentMouseDown, false);
-        document.addEventListener( "mousemove", this.onDocumentMouseMove, false );
+        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
+        document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
 
     }
 
