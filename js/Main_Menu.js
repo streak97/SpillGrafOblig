@@ -2,7 +2,6 @@
  *
  * Displays and handles the main menu
  */
-"use strict";
 
 class Main_Menu extends Engine {
 
@@ -12,7 +11,6 @@ class Main_Menu extends Engine {
         this.objects = [];
 
         this.raycaster = null;
-        this.mouse = null;
         this.active = false;
     }
 
@@ -47,7 +45,6 @@ class Main_Menu extends Engine {
 
         this.raycaster = new THREE.Raycaster();
         let INTERSECTED;
-        this.mouse = new THREE.Vector2();
 
         document.addEventListener("mousedown", this.onDocumentMouseDown, false);
         document.addEventListener( "mousemove", this.onDocumentMouseMove, false );
@@ -115,13 +112,15 @@ class Main_Menu extends Engine {
             signMesh.add(textMesh);
 
         });
+        signMesh.scale.x = 10;
+        signMesh.scale.y = 10;
 
         return signMesh
     }
 
     animate(){
-        if(this.active){
-            requestAnimationFrame(this.animate);
+        if(this.active === true){
+            requestAnimationFrame(this.animate.bind(this));
         }
 
         this.render();
@@ -174,6 +173,7 @@ class Main_Menu extends Engine {
 
     onDocumentMouseMove(e){
         e.preventDefault();
+        console.log(this.mouse);
         this.mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
         this.mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
     }
