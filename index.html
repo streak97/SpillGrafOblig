@@ -4,7 +4,21 @@
     <meta charset="UTF-8">
     <title>Platformer - prosjekt</title>
 </head>
-<body>
+<body onload="play()">
+    <canvas id="webgl" width="600" height="600" >
+        Denne nettleseren st�tter ikke "canvas"-elementet!
+    </canvas>
 
+    <script src="lib/three.js"></script>
+    <script src="lib/FirstPersonControls.js"></script>
+    <script src="lib/keyboard.js"></script>
+    <script src="lib/ammo.js"></script>
+    <script src="lib/physi.js"></script>
+    <script src="lib/physijs_worker.js"></script>
+
+    <script src="js/engine.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/level.js"></script>
+    <script src="js/main_menu.js"></script>
 </body>
 </html>
