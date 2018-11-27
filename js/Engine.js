@@ -12,7 +12,7 @@ class Engine{
         this.renderer = renderer;
 
         this.camera = null;
-        this.mouse = new THREE.Vector3();
+        this.mouse = new THREE.Vector2();
     }
 
     setState(state){
