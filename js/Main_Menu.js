@@ -163,7 +163,7 @@ class Main_Menu extends Engine {
         if (intersects.length > 0) {
             let opt = intersects[0].object.name.split(":")[1];
             switch (opt) {
-                case "Start": super.setState(this.STATE_GAME);console.log(opt);break;
+                case "Start": super.setState(this.STATE_GAME);console.log(opt);this.active = false;break;
                 case "Options": super.setState(this.STATE_GAME);console.log(opt);break;
                 case "Info": super.setState(this.STATE_GAME);console.log(opt);break;
             }

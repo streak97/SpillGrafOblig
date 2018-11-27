@@ -6,7 +6,7 @@ class Engine{
         this.STATE_MENU = 1;
         this.STATE_GAME = 2;
 
-        this.GAME_STATE = Engine.STATE_MENU;
+        this.GAME_STATE = this.STATE_MENU;
 
         this.scene = scene;
         this.renderer = renderer;
