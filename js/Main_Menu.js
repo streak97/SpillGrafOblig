@@ -38,7 +38,7 @@ class Main_Menu extends Engine {
         directionalLight.castShadow = true;
         this.scene.add(directionalLight);
 
-        let ambientLight = new THREE.AmbientLight("#525252");
+        let ambientLight = new THREE.AmbientLight("#cccccc");
         this.scene.add(ambientLight);
 
         window.addEventListener("resize", this.onWindowResize.bind(this), false);
@@ -74,7 +74,6 @@ class Main_Menu extends Engine {
         let signTxt = loader.load("textures/Bumpy_Yellow_Diffuse.jpg"); //http://www.bctv.kr/yabc/%EC%97%AC%EA%B8%B0%EC%A3%BC%EC%84%B8%EC%9A%94/%ED%94%84%EB%A6%AC%EB%AF%B8%EC%96%B4_%EC%97%90%ED%8E%99_%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8/TPL_Material-Pack-Element3D-V2/_Material-Pack/Metal/Bumpy_Yellow_Diffuse.jpg
         signTxt.wrapS = THREE.RepeatWrapping;
         signTxt.wrapT = THREE.RepeatWrapping;
-        signTxt.repeat.set(6, 5);
         let signMat = new THREE.MeshPhongMaterial({map: signTxt, side: THREE.DoubleSide});
 
         let boxGeo = new THREE.BoxBufferGeometry(6, 5, 1);
@@ -173,7 +172,6 @@ class Main_Menu extends Engine {
 
     onDocumentMouseMove(e){
         e.preventDefault();
-        console.log(this.mouse);
         this.mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
         this.mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
     }
