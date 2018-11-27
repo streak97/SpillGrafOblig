@@ -6,16 +6,13 @@
 class main_menu extends engine {
 
     constructor(scene, renderer) {
-        super();
-        this.scene = scene;
-        this.renderer = renderer;
+        super(scene, renderer);
 
         this.objects = [];
 
         this.raycaster = null;
         this.mouse = null;
         this.active = false;
-        this.camera = null;
     }
 
     start(){
@@ -144,7 +141,7 @@ class main_menu extends engine {
             this.INTERSECTED = null;
         }
 
-        this.renderer.render(this.scene, this.camera);
+        super.render();
     }
 
     onWindowResize() {
