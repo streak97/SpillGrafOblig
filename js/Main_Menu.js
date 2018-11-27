@@ -3,7 +3,8 @@
  * Displays and handles the main menu
  */
 "use strict";
-class main_menu extends engine {
+
+class Main_Menu extends Engine {
 
     constructor(scene, renderer) {
         super(scene, renderer);
@@ -45,7 +46,8 @@ class main_menu extends engine {
         window.addEventListener("resize", this.onWindowResize, false);
 
         this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2(), INTERSECTED;
+        let INTERSECTED;
+        this.mouse = new THREE.Vector2();
 
         document.addEventListener("mousedown", this.onDocumentMouseDown, false);
         document.addEventListener( "mousemove", this.onDocumentMouseMove, false );
@@ -130,7 +132,7 @@ class main_menu extends engine {
 
         let intersects = this.raycaster.intersectObjects( this.objects);
         if ( intersects.length > 0 ) {
-            if ( this.INTERSECTED !== intersects[0].object ) {
+            if ( this.mouse.INTERSECTED !== intersects[0].object ) {
                 if ( this.INTERSECTED ) this.INTERSECTED.material.emissive.setHex( this.INTERSECTED.currentHex );
                 this.INTERSECTED = intersects[ 0 ].object;
                 this.INTERSECTED.currentHex = this.INTERSECTED.material.emissive.getHex();
@@ -163,9 +165,9 @@ class main_menu extends engine {
         if (intersects.length > 0) {
             let opt = intersects[0].object.name.split(":")[1];
             switch (opt) {
-                case "Start": super.setState(engine.STATE_GAME);break;
-                case "Options": super.setState(engine.STATE_GAME);break;
-                case "Info": super.setState(engine.STATE_GAME);break;
+                case "Start": super.setState(this.STATE_GAME);console.log(opt);break;
+                case "Options": super.setState(this.STATE_GAME);console.log(opt);break;
+                case "Info": super.setState(this.STATE_GAME);console.log(opt);break;
             }
         }
     }

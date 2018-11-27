@@ -1,10 +1,12 @@
-class engine{
-
-    static STATE_MENU = 1;
-    static STATE_GAME = 2;
+"use strict";
+class Engine{
 
     constructor(scene, renderer){
-        this.GAME_STATE = engine.STATE_MENU;
+
+        this.STATE_MENU = 1;
+        this.STATE_GAME = 2;
+
+        this.GAME_STATE = Engine.STATE_MENU;
 
         this.scene = scene;
         this.renderer = renderer;

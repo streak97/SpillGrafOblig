@@ -1,4 +1,5 @@
-class level extends engine{
+"use strict";
+class Level extends Engine {
 
     constructor(scene, renderer) {
         super(scene, renderer);
