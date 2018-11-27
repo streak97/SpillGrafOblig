@@ -154,7 +154,6 @@ class main_menu extends engine {
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-        //controls.handleResize();
         this.render();
     }
 
