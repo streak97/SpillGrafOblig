@@ -6,19 +6,47 @@ class Level extends Engine {
 
     constructor(scene, renderer) {
         super(scene, renderer);
+
+        this.clearThree(scene);
     }
 
     start(level) {
-        this.setUpSkybox(this.scene, this.renderer, level);
+        this.setUpScene();
+        this.setUpSkybox(this.scene, this.renderer, this.camera, level);
     }
 
-    setUpSkybox(scene, renderer, skybox) {
+    setUpScene() {
+        // CAMERA
+        this.camera = new THREE.PerspectiveCamera(85, 16/9, .025, 20000);
+        this.camera.position.set(1, 1, 1);
+        this.camera.lookAt(0, 0, 0);
+
+        let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.position.set(new THREE.Vector3(50, 250, 20));
+        directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
+        directionalLight.castShadow = true;
+        this.scene.add(directionalLight);
+
+        let ambientLight = new THREE.AmbientLight("#CCCCCC");
+        this.scene.add(ambientLight);
+
+        window.addEventListener("resize", this.onWindowResize.bind(this), false);
+    }
+
+    clearThree(obj){
+        while(obj.children.length > 0){
+            this.clearThree(obj.children[0]);
+            obj.remove(obj.children[0]);
+        }
+        if(obj.geometry) obj.geometry.dispose();
+        if(obj.material) obj.material.dispose();
+        if(obj.texture) obj.texture.dispose();
+    }
+
+    setUpSkybox(scene, renderer, camera, skybox) {
         let skyDir = "./textures/skybox" + skybox + "/";
 
-        // CAMERA
-        let camera = new THREE.PerspectiveCamera(85, 16/9, .025, 20000);
-        camera.position.set(1, 1, 1);
-        camera.lookAt(0, 0, 0);
+
 
         // LOAD CUBE TEXTURE
         new THREE.CubeTextureLoader()
@@ -43,5 +71,15 @@ class Level extends Engine {
                     renderer.render(scene, camera);
 
                 });
+    }
+
+    onWindowResize() {
+
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        this.render();
     }
 }

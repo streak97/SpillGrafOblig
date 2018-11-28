@@ -53,7 +53,7 @@ class Main_Menu extends Engine {
         );
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(new THREE.Vector3(0, 200, 10));
+        directionalLight.position.set(new THREE.Vector3(50, 250, 20));
         directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
         directionalLight.castShadow = true;
         this.scene.add(directionalLight);
@@ -102,7 +102,7 @@ class Main_Menu extends Engine {
         let planeMesh = new THREE.Mesh(planeGeo, bkMat);
         planeMesh.name = "Background";
         planeMesh.receiveShadow = true;
-        planeMesh.translateZ(-10);
+        planeMesh.translateZ(-3);
 
         return planeMesh;
     }
