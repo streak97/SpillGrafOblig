@@ -44,6 +44,7 @@ class Main_Menu extends Engine {
             "assets/music/bensound-epic.ogg",
             function(audioBuffer){
                 music.setBuffer(audioBuffer);
+                music.setLoop(true);
                 music.play();
             },
             function ( xhr ) {
