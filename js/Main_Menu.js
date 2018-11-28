@@ -103,7 +103,7 @@ class Main_Menu extends Engine {
         signMesh.castShadow = true;
         signMesh.receiveShadow = true;
 
-        let mat = new THREE.MeshPhongMaterial({color: "#00cc00", side: THREE.DoubleSide});
+        let mat = new THREE.MeshPhongMaterial({color: "#0000ff", side: THREE.DoubleSide});
         let fontLoader = new THREE.FontLoader();
 
         fontLoader.load("fonts/helvetiker_regular.typeface.json", function (font) {
@@ -112,18 +112,15 @@ class Main_Menu extends Engine {
                 size: 0.25,
                 height: 0.5,
                 curveSegments: 12,
-                bevelEnabled: true,
-                bevelThickness: 0.01,
-                bevelSize: 0.03,
-                bevelSegments: 2
             };
             let textGeo = new THREE.TextBufferGeometry(text, text_attr);
 
 
             let textMesh = new THREE.Mesh(textGeo, mat);
             textMesh.name = "text:" + text;
-            textMesh.translateX(-2.5);
-            textMesh.translateY(1);
+            textMesh.translateX(-2);
+            textMesh.scale.x = 3;
+            textMesh.scale.y = 3;
             textMesh.castShadow = true;
             textMesh.receiveShadow = true;
 
