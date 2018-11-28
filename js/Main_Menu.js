@@ -219,6 +219,7 @@ class Main_Menu extends Engine {
                 case "Start":
                     super.setState(this.STATE_GAME);
                     this.active = false;
+                    this.scene.getObjectByName("music").stop();
                     console.log(opt);
                     new Level(this.scene, this.renderer).start(1);
                     break;
@@ -229,12 +230,14 @@ class Main_Menu extends Engine {
                 case "Info":
                     super.setState(this.STATE_GAME);
                     this.saved_scene = scene;
+                    this.scene.getObjectByName("music").stop();
                     this.scene = this.info_scene;
                     console.log(opt);
                     break;
                 case "Back":
                     super.setState(this.STATE_GAME);
                     this.scene = this.saved_scene;
+                    this.scene.getObjectByName("music").play();
                     console.log(opt);
                     break;
             }
