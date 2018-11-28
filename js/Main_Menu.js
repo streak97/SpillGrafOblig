@@ -32,6 +32,25 @@ class Main_Menu extends Engine {
         this.camera.up = new THREE.Vector3(0, 1, 0);
         this.camera.lookAt(new THREE.Vector3(0, 200, 0));
 
+        let listener = new THREE.AudioListener();
+        this.camera.add(listener);
+
+        let music = new THREE.Audio(listener);
+        this.scene.add(music);
+
+        let mLoader = new THREE.AudioLoader();
+
+        mLoader.load(
+            "assets/music/bensound-epic.ogg",
+            function(audioBuffer){
+                music.setBuffer(audioBuffer);
+                music.play();
+            },
+            function ( xhr ) {
+                console.log( "Music: " + (xhr.loaded / xhr.total * 100) + '% loaded' );
+            }
+        );
+
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.position.set(new THREE.Vector3(0, 200, 10));
         directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
