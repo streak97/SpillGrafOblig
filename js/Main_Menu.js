@@ -12,12 +12,15 @@ class Main_Menu extends Engine {
 
         this.raycaster = null;
         this.active = false;
+        this.info_scene = new THREE.Scene();
+        this.saved_scene = scene;
     }
 
     start(){
         this.active = true;
         this.setupScene();
 
+        this.setupInfoScene();
         this.menuObjects();
         this.animate();
     }
@@ -31,6 +34,40 @@ class Main_Menu extends Engine {
 
         this.camera.up = new THREE.Vector3(0, 1, 0);
         this.camera.lookAt(new THREE.Vector3(0, 200, 0));
+
+        let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.position.set(new THREE.Vector3(0, 200, 10));
+        directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
+        directionalLight.castShadow = true;
+        this.scene.add(directionalLight);
+
+        let ambientLight = new THREE.AmbientLight("#cccccc");
+        this.scene.add(ambientLight);
+
+        window.addEventListener("resize", this.onWindowResize.bind(this), false);
+
+        this.raycaster = new THREE.Raycaster();
+        let INTERSECTED;
+
+        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
+        document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
+
+    }
+
+    setupInfoScene(){
+        this.info_scene = this.scene.clone();
+
+        let infoboard = this.createOption("Here is some info");
+        infoboard.translateY(250);
+        this.info_scene.add(infoboard);
+
+        let back_opt = this.createOption("Back");
+        back_opt.translateY(150);
+        this.info_scene.add(back_opt);
+        this.objects.push(back_opt);
+    }
+
+    menuObjects(){
 
         let listener = new THREE.AudioListener();
         this.camera.add(listener);
@@ -52,26 +89,6 @@ class Main_Menu extends Engine {
             }
         );
 
-        let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(new THREE.Vector3(0, 200, 10));
-        directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
-        directionalLight.castShadow = true;
-        this.scene.add(directionalLight);
-
-        let ambientLight = new THREE.AmbientLight("#cccccc");
-        this.scene.add(ambientLight);
-
-        window.addEventListener("resize", this.onWindowResize.bind(this), false);
-
-        this.raycaster = new THREE.Raycaster();
-        let INTERSECTED;
-
-        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
-        document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
-
-    }
-
-    menuObjects(){
         let start_opt = this.createOption("Start");
         start_opt.translateY(300);
         this.scene.add(start_opt);
@@ -180,9 +197,26 @@ class Main_Menu extends Engine {
         if (intersects.length > 0) {
             let opt = intersects[0].object.name.split(":")[1];
             switch (opt) {
-                case "Start": super.setState(this.STATE_GAME);console.log(opt);this.active = false;break;
-                case "Options": super.setState(this.STATE_GAME);console.log(opt);break;
-                case "Info": super.setState(this.STATE_GAME);console.log(opt);break;
+                case "Start":
+                    super.setState(this.STATE_GAME);
+                    this.active = false;
+                    console.log(opt);
+                    break;
+                case "Options":
+                    super.setState(this.STATE_GAME);
+                    console.log(opt);
+                    break;
+                case "Info":
+                    super.setState(this.STATE_GAME);
+                    this.saved_scene = scene;
+                    this.scene = this.info_scene;
+                    console.log(opt);
+                    break;
+                case "Back":
+                    super.setState(this.STATE_GAME);
+                    this.scene = this.saved_scene;
+                    console.log(opt);
+                    break;
             }
         }
     }
