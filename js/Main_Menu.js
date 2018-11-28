@@ -77,6 +77,7 @@ class Main_Menu extends Engine {
         this.camera.add(listener);
 
         let music = new THREE.Audio(listener);
+        music.name = "music";
         this.scene.add(music);
 
         let mLoader = new THREE.AudioLoader();
