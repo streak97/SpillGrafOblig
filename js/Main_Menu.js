@@ -36,13 +36,17 @@ class Main_Menu extends Engine {
         this.camera.lookAt(new THREE.Vector3(0, 200, 0));
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(new THREE.Vector3(0, 200, 10));
+        directionalLight.position.set(new THREE.Vector3(50, 250, 20));
         directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
         directionalLight.castShadow = true;
         this.scene.add(directionalLight);
 
-        let ambientLight = new THREE.AmbientLight("#cccccc");
+        let ambientLight = new THREE.AmbientLight("0xCCCCCC");
         this.scene.add(ambientLight);
+
+        let backG = this.backgroundPlane();
+        backG.translateY(200);
+        this.scene.add(backG);
 
         window.addEventListener("resize", this.onWindowResize.bind(this), false);
 
@@ -103,7 +107,21 @@ class Main_Menu extends Engine {
         info_opt.translateY(100);
         this.scene.add(info_opt);
         this.objects.push(info_opt);
+    }
 
+    backgroundPlane() {
+        let loader = new THREE.TextureLoader();
+        let bckTxt = loader.load("textures/skybox1/back.png");
+        let bkMat = new THREE.MeshPhongMaterial({map: bckTxt, side: THREE.DoubleSide});
+
+        let planeGeo = new THREE.PlaneBufferGeometry(400, 400);
+
+        let planeMesh = new THREE.Mesh(planeGeo, bkMat);
+        planeMesh.name = "Background";
+        planeMesh.receiveShadow = true;
+        planeMesh.translateZ(-3);
+
+        return planeMesh;
     }
 
     createOption(text){
@@ -201,6 +219,7 @@ class Main_Menu extends Engine {
                     super.setState(this.STATE_GAME);
                     this.active = false;
                     console.log(opt);
+                    new Level(this.scene, this.renderer).start(1);
                     break;
                 case "Options":
                     super.setState(this.STATE_GAME);
