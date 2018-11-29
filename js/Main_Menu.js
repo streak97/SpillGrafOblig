@@ -53,8 +53,8 @@ class Main_Menu extends Engine {
         this.raycaster = new THREE.Raycaster();
         let INTERSECTED;
 
-        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
-        document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
+        this.clickistener = document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
+        this.movelistener = document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
 
     }
 
@@ -219,9 +219,10 @@ class Main_Menu extends Engine {
                 case "Start":
                     super.setState(this.STATE_GAME);
                     this.active = false;
-                    this.scene.getObjectByName("music").stop();
+                    //this.scene.getObjectByName("music").stop();
                     console.log(opt);
-                    new Level(this.scene, this.renderer).start(1);
+                    this.removeListeners();
+                    new Level(new THREE.Scene(), this.renderer).start(1);
                     break;
                 case "Options":
                     super.setState(this.STATE_GAME);
@@ -250,4 +251,9 @@ class Main_Menu extends Engine {
         this.mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
     }
 
+    removeListeners() {
+        document.addEventListener('mousedown', function (event)  {
+            event.stopPropagation();
+        }, true);
+    }
 }
