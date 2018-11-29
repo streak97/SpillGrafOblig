@@ -7,12 +7,15 @@ class Level extends Engine {
     constructor(scene, renderer) {
         super(scene, renderer);
 
+        this.terrainGeo = null;
+
         this.clearThree(scene);
     }
 
     start(level) {
         this.setUpScene();
         this.setUpSkybox(this.scene, this.renderer, this.camera, level);
+        this.addTerrain();
         this.scene.add(this.createCone());
 
     }
@@ -33,6 +36,34 @@ class Level extends Engine {
         this.scene.add(ambientLight);
 
         window.addEventListener("resize", this.onWindowResize.bind(this), false);
+    }
+
+    terrainHeightLoaded(data){
+        this.terrainGeo = new THREE.PlaneBufferGeometry(500, 1000, 511, 1023);
+
+        for (var i = 0, len = this.terrainGeo.vertices.length; i < len; i++) {
+            terrainGeo.vertices[i].z = data[i] / 3;
+        }
+
+        let texMap = THREE.TextureLoader().load("textures/grass_texture.jpg");
+        texMap.wrapS = THREE.RepeatWrapping;
+        texMap.wrapT = THREE.RepeatWrapping;
+        texMap.repeat.x = 4;
+        texMap.repeat.y = 8;
+
+        //TODO: Physijs material
+
+        this.terrainGeo.computeVertexNormals();
+        this.terrainGeo.computeFaceNormals();
+
+        //TODO: Physijs mesh
+
+        //TODO: Water plane
+
+    }
+
+    addTerrain(){
+        getHeightData("textures/heightmap.png", 512, 1024, this.terrainHeightLoaded);
     }
 
     clearThree(obj){
