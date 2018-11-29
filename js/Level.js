@@ -274,6 +274,7 @@ class Level extends Engine {
             // }
             this.prevTime = time;
         }
+        this.animateFire();
 
         this.render();
     }
