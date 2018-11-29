@@ -10,14 +10,18 @@ class Level extends Engine {
         this.terrainGeo = null;
 
         this.clearThree(scene);
+        this.fire_frame = 1;
+        this.fires = [];
     }
 
     start(level) {
         this.setUpScene();
         this.setUpSkybox(this.scene, this.renderer, this.camera, level);
-        this.addTerrain();
-        this.scene.add(this.createCone());
+        //this.addTerrain();
+        this.scene.add(this.createCone("test", true));
 
+        //animationtesting
+        //setInterval(this.animateFire.bind(this), 100);
     }
 
     setUpScene() {
@@ -79,8 +83,6 @@ class Level extends Engine {
     setUpSkybox(scene, renderer, camera, skybox) {
         let skyDir = "./textures/skybox" + skybox + "/";
 
-
-
         // LOAD CUBE TEXTURE
         new THREE.CubeTextureLoader()
             .setPath(skyDir)
@@ -106,7 +108,7 @@ class Level extends Engine {
                 });
     }
 
-    createCone(){
+    createCone(name, hazard){
         let texLoader = new THREE.TextureLoader();
         let top = texLoader.load("textures/platform_top_texture.png");
         let sides = texLoader.load("textures/platform_side_texture.png");
@@ -121,12 +123,72 @@ class Level extends Engine {
 
         let platformGeo = new THREE.ConeBufferGeometry(10, 25, 12);
         let platformMesh = new THREE.Mesh(platformGeo, matArr);
+        platformMesh.name = "cone:" + name;
         platformMesh.rotation.x = Math.PI;
         platformMesh.castShadow = true;
         platformMesh.receiveShadow = true;
 
+        if(hazard === true){
+            platformMesh.add(this.addHazard(name));
+        } else {
+            platformMesh.add(this.addCoin(name));
+        }
+
         return platformMesh;
 
+    }
+
+    addCoin(name){
+        let texLoader = new THREE.TextureLoader();
+
+        let spriteTex = texLoader.load("textures/coin_texture.png");
+        let matSprite = new THREE.SpriteMaterial({map: spriteTex});
+
+        let coin = new THREE.Sprite(matSprite);
+        coin.name = "hazard:" + name;
+        coin.scale.set(5, 5, 5);
+        coin.position.set(5,-20,0);
+        coin.updateMatrix();
+
+        return coin;
+    }
+
+    addHazard(name){
+        let texLoader = new THREE.TextureLoader();
+
+        let spriteTex = texLoader.load("textures/fire_grid.png");
+
+        spriteTex.wrapS = spriteTex.wrapT = THREE.RepeatWrapping;
+        spriteTex.repeat = new THREE.Vector2(1/8, 1/4);
+        spriteTex.name = "fire_texture";
+
+        let matSprite = new THREE.SpriteMaterial({
+            map: spriteTex,
+        });
+
+        let haz = new THREE.Sprite(matSprite);
+        haz.name = "haz:" + name;
+        haz.scale.set(20, 20, 20);
+        haz.position.set(-5,-20,0);
+        haz.updateMatrix();
+        this.fires.push(spriteTex);
+
+        return haz;
+    }
+
+    animateFire(){
+        for (let i = 0; i < this.fires.length; i++) {
+            this.fire_frame = (this.fire_frame + 1) % (4*8);
+            let u = 1/8 * (this.fire_frame % 8);
+            let v = 1/4 * Math.floor(this.fire_frame / 8);
+
+            let haz = this.fires[i];
+
+            haz.offset.x = u;
+            haz.offset.y = v;
+            haz.needsUpdate = true;
+        }
+        this.render();
     }
 
     onWindowResize() {

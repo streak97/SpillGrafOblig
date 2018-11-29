@@ -41,7 +41,7 @@ class Main_Menu extends Engine {
         directionalLight.castShadow = true;
         this.scene.add(directionalLight);
 
-        let ambientLight = new THREE.AmbientLight("0xCCCCCC");
+        let ambientLight = new THREE.AmbientLight("#CCCCCC");
         this.scene.add(ambientLight);
 
         let backG = this.backgroundPlane();
