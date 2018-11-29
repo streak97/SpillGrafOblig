@@ -116,7 +116,7 @@ class Level extends Engine {
         var floor = new THREE.Mesh( floorGeometry, floorMaterial );
         physObj.add(floor);
 
-        let cone1 = this.createCone();
+        let cone1 = this.createCone("test", true);
 
         cone1.scale.set(5,5,5);
         cone1.translateY(5);
