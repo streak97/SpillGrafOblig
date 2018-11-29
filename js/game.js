@@ -15,6 +15,6 @@ function play(){
     let menu = new Main_Menu(scene, renderer);
     let level = new Level(scene, renderer);
 
-    level.start(1);
+    menu.start();
 
 }
