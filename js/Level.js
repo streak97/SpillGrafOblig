@@ -13,12 +13,14 @@ class Level extends Engine {
     start(level) {
         this.setUpScene();
         this.setUpSkybox(this.scene, this.renderer, this.camera, level);
+        this.scene.add(this.createCone());
+
     }
 
     setUpScene() {
         // CAMERA
         this.camera = new THREE.PerspectiveCamera(85, 16/9, .025, 20000);
-        this.camera.position.set(1, 1, 1);
+        this.camera.position.set(100, 100, 1);
         this.camera.lookAt(0, 0, 0);
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
@@ -71,6 +73,29 @@ class Level extends Engine {
                     renderer.render(scene, camera);
 
                 });
+    }
+
+    createCone(){
+        let texLoader = new THREE.TextureLoader();
+        let top = texLoader.load("textures/platform_top_texture.png");
+        let sides = texLoader.load("textures/platform_side_texture.png");
+        sides.center = new THREE.Vector2(0.5, 0.5);
+        sides.rotation = Math.PI/2;
+
+        let matArr = [
+            new THREE.MeshPhongMaterial({map:sides, side: THREE.DoubleSide}),
+            new THREE.MeshPhongMaterial({map:sides, side: THREE.DoubleSide}),
+            new THREE.MeshPhongMaterial({map:top, side: THREE.DoubleSide}),
+        ];
+
+        let platformGeo = new THREE.ConeBufferGeometry(10, 25, 12);
+        let platformMesh = new THREE.Mesh(platformGeo, matArr);
+        platformMesh.rotation.x = Math.PI;
+        platformMesh.castShadow = true;
+        platformMesh.receiveShadow = true;
+
+        return platformMesh;
+
     }
 
     onWindowResize() {

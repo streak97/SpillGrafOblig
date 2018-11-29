@@ -13,7 +13,8 @@ function play(){
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     let menu = new Main_Menu(scene, renderer);
+    let level = new Level(scene, renderer);
 
-    menu.start();
+    level.start(1);
 
 }
