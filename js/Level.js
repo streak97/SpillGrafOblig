@@ -7,6 +7,9 @@ class Level extends Engine {
     constructor(scene, renderer) {
         super(scene, renderer);
 
+        // Player
+        this.player = null;
+
         this.raycaster = null;
         this.moveForward = false;
         this.moveBackward = false;
@@ -25,6 +28,7 @@ class Level extends Engine {
 
     start(level) {
         this.setUpScene();
+        this.setUpPlayer();
         this.setUpSkybox(this.scene, this.renderer, this.camera, level);
         this.setUpPlatforms();
 
@@ -38,11 +42,6 @@ class Level extends Engine {
         this.camera.lookAt(0, 0, 0);
 
         this.controls = new THREE.PointerLockControls(this.camera);
-        this.controls.lock();
-        this.controls.lock();
-        this.controls.lock();
-        this.controls.lock();
-        this.controls.lock();
         this.controls.lock();
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
@@ -58,6 +57,9 @@ class Level extends Engine {
         window.addEventListener("resize", this.onWindowResize.bind(this), false);
         document.addEventListener( 'keydown', this.onKeyDown.bind(this), false );
         document.addEventListener( 'keyup', this.onKeyUp.bind(this), false );
+        document.addEventListener('click', function () {
+            this.controls.lock();
+        }.bind(this), false);
 
 
         this.raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10);
@@ -107,6 +109,7 @@ class Level extends Engine {
 
         var floor = new THREE.Mesh( floorGeometry, floorMaterial );
         physObj.add(floor);
+        floor.position.y = -1.0;
 
         let cone1 = this.createCone();
 
@@ -115,6 +118,7 @@ class Level extends Engine {
         this.scene.add(cone1);
         this.scene.add( physObj );
         this.objects.push( physObj );
+        this.objects.push(cone1);
     }
 
     onKeyDown( event ) {
@@ -166,6 +170,8 @@ class Level extends Engine {
             case 16: // shift
                 this.moveSpeed = 5;
                 break;
+            case 32:
+                this.canJump = true;
         }
     }
 
@@ -207,6 +213,7 @@ class Level extends Engine {
 
 
     animate(elapsed) {
+        this.scene.simulate();
         requestAnimationFrame(this.animate.bind(this));
 
         if ( this.controls.isLocked === true ) {
@@ -226,7 +233,6 @@ class Level extends Engine {
             if ( this.moveLeft || this.moveRight ) this.velocity.x -= this.direction.x * 400.0 * delta;
             if ( onObject === true ) {
                 this.velocity.y = Math.max( 0, this.velocity.y );
-                this.canJump = true;
             }
             this.controls.getObject().translateX( this.velocity.x * delta );
             this.controls.getObject().translateY( this.velocity.y * delta );
@@ -265,7 +271,6 @@ class Level extends Engine {
         platformMesh.castShadow = true;
         platformMesh.receiveShadow = true;
 
-        this.objects.push(platformMesh);
         return platformMesh;
 
     }
@@ -278,5 +283,9 @@ class Level extends Engine {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         this.render();
+    }
+
+    setUpPlayer() {
+
     }
 }
