@@ -219,10 +219,10 @@ class Main_Menu extends Engine {
                 case "Start":
                     super.setState(this.STATE_GAME);
                     this.active = false;
-                    //this.scene.getObjectByName("music").stop();
+                    this.scene.getObjectByName("music").stop();
                     console.log(opt);
                     this.removeListeners();
-                    new Level(new THREE.Scene(), this.renderer).start(1);
+                    new Level(new Physijs.Scene, this.renderer).start(1);
                     break;
                 case "Options":
                     super.setState(this.STATE_GAME);
