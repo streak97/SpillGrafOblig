@@ -51,6 +51,7 @@ class Level extends Engine {
         this.player = this.addPlayer();
         this.setUpScene();
         this.setUpSkybox(this.scene, this.renderer, this.camera, level);
+        this.plat_pos = setPlatformPositions();
         this.addTerrain();
         this.setUpPlatforms();
 
@@ -86,11 +87,17 @@ class Level extends Engine {
     }
 
     setUpPlatforms() {
-        let cone1 = this.createCone("test", true);
+        for (let i = 0; i < this.plat_pos.length; i++) {
+            let val = this.plat_pos[i];
+            let cone = this.createCone(i, val.haz);
 
-        cone1.translateY(5);
-        this.scene.add(cone1);
-        this.objects.push(cone1);
+            cone.translateX(val.x*10);
+            cone.translateY(val.y*10);
+            cone.translateZ(val.z*10);
+
+            this.scene.add(cone);
+            this.objects.push(cone);
+        }
 
     }
 
@@ -306,8 +313,8 @@ class Level extends Engine {
         let coin = new THREE.Sprite(matSprite);
 
         coin.name = "hazard:" + name;
-        coin.scale.set(5, 5, 5);
-        coin.position.set(5, -20, 0);
+        coin.scale.set(10, 10, 10);
+        coin.position.set(-25, -100, 0);
         coin.updateMatrix();
 
         return coin;
@@ -360,23 +367,6 @@ class Level extends Engine {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         this.render();
-    }
-
-    setPlatformPositions(){
-        this.plat_pos = [
-            {
-                x: 0,
-                y: 0,
-                z: 0,
-                haz: false
-            },
-            {
-                x: 10,
-                y: 0,
-                z: 1,
-                haz: false
-            },
-        ];
     }
 
 }
