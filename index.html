@@ -9,23 +9,34 @@ index.html for canvas elementet
 <head>
     <meta charset="UTF-8">
     <title>Platformer - project</title>
+    <!--Fjerner scrollbar-->
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body onload="play()">
-    <canvas id="canvas" width="600" height="600" >
-        This browser does not support canvas-elements
-    </canvas>
+<canvas id="canvas" width="600" height="600">
+    This browser does not support canvas-elements
+</canvas>
 
-    <script src="lib/three.js"></script>
-    <script src="lib/FirstPersonControls.js"></script>
-    <script src="lib/keyboard.js"></script>
-    <script src="lib/ammo.js"></script>
-    <script src="lib/physi.js"></script>
-    <script src="lib/physijs_worker.js"></script>
-    <script src="lib/PointerLockControls.js"></script>
+<script src="lib/three.js"></script>
+<script src="lib/FirstPersonControls.js"></script>
+<script src="lib/keyboard.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script src="lib/ammo.js"></script>
+<script src="lib/wfa-utils.js"></script>
+<script src="lib/physi.js"></script>
+<script src="lib/physijs_worker.js"></script>
 
-    <script src="js/Engine.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/Level.js"></script>
-    <script src="js/Main_Menu.js"></script>
+<script src="js/Engine.js"></script>
+<script src="js/Level.js"></script>
+<script src="js/Main_Menu.js"></script>
+<script src="js/game.js"></script>
 </body>
 </html>

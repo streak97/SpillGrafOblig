@@ -5,19 +5,30 @@
 class Level extends Engine {
 
     constructor(scene, renderer) {
+        Physijs.scripts.worker = './lib/physijs_worker.js';
+        Physijs.scripts.ammo = './ammo.js';
+        scene = new Physijs.Scene({fixedTimeStep: 1 / 8});
         super(scene, renderer);
-
+        this.scene.setGravity(new THREE.Vector3(0, -10, 0));
         // Player
         this.player = null;
+        this.terranLoaded = false;
+        this.keys = {
+            LEFT: {code: 37, isPressed: false},
+            UP: {code: 38, isPressed: false},
+            RIGHT: {code: 39, isPressed: false},
+            A: {code: 65, isPressed: false},
+            D: {code: 68, isPressed: false},
+            W: {code: 87, isPressed: false}
+        };
 
         this.raycaster = null;
-        this.moveForward = false;
-        this.moveBackward = false;
-        this.moveLeft = false;
-        this.moveRight = false;
+        this.runSpeed = 7;
+        this.walkSpeed = 3;
+        this.clock = new THREE.Clock();
         this.canJump = false;
         this.objects = [];
-        this.moveSpeed = 5;
+        this.playerSpeed = 0;
 
         this.prevTime = performance.now();
         this.velocity = new THREE.Vector3();
@@ -31,10 +42,10 @@ class Level extends Engine {
     }
 
     start(level) {
+        this.player = this.addPlayer();
         this.setUpScene();
-        this.setUpPlayer();
         this.setUpSkybox(this.scene, this.renderer, this.camera, level);
-        //this.addTerrain();
+        this.addTerrain();
         this.setUpPlatforms();
 
         //animationtesting
@@ -45,180 +56,111 @@ class Level extends Engine {
     setUpScene() {
         // CAMERA
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-        this.camera.position.set(1, 20, 1);
+        this.camera.position.set(-30, 150, 150);
         this.camera.lookAt(0, 0, 0);
 
-        this.controls = new THREE.PointerLockControls(this.camera);
-        this.controls.lock();
+        this.controls = new THREE.OrbitControls(this.camera);
+        this.controls.autoRotate = true;
+        this.controls.target = this.player.position;
+
+        this.player.position.set(0, 130, 0);
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.position.set(new THREE.Vector3(50, 250, 20));
         directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
         directionalLight.castShadow = true;
         this.scene.add(directionalLight);
-
+        this.scene.add(this.player);
         let ambientLight = new THREE.AmbientLight("#CCCCCC");
         this.scene.add(ambientLight);
-        this.controls.getObject().position.y = 300;
-        this.scene.add(this.controls.getObject());
+        this.scene.add(this.camera);
         window.addEventListener("resize", this.onWindowResize.bind(this), false);
-        document.addEventListener( 'keydown', this.onKeyDown.bind(this), false );
-        document.addEventListener( 'keyup', this.onKeyUp.bind(this), false );
-        document.addEventListener('click', function () {
-            this.controls.lock();
-        }.bind(this), false);
-
-
-        this.raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10);
+        window.addEventListener('keydown', this.onKeyDown.bind(this), false);
+        window.addEventListener('keyup', this.onKeyUp.bind(this), false);
     }
 
     setUpPlatforms() {
-        // floor
-
-        var floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
-        floorGeometry.rotateX( - Math.PI / 2 );
-
-        // vertex displacement
-
-        var position = floorGeometry.attributes.position;
-
-        for ( var i = 0, l = position.count; i < l; i ++ ) {
-
-            this.vertex.fromBufferAttribute( position, i );
-
-            this.vertex.x += Math.random() * 20 - 10;
-            this.vertex.y += Math.random() * 2;
-            this.vertex.z += Math.random() * 20 - 10;
-
-            position.setXYZ( i, this.vertex.x, this.vertex.y, this.vertex.z );
-
-        }
-
-        floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
-
-        position = floorGeometry.attributes.position;
-        var colors = [];
-
-        for ( var i = 0, l = position.count; i < l; i ++ ) {
-
-            this.color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-            colors.push( this.color.r, this.color.g, this.color.b );
-
-        }
-
-        floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-
-        var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-
-        var physMaterial = new Physijs.createMaterial(floorMaterial);
-        physMaterial.visible = false;
-        var physObj = new Physijs.CapsuleMesh(floorGeometry, physMaterial, 0);
-
-        var floor = new THREE.Mesh( floorGeometry, floorMaterial );
-        physObj.add(floor);
-        floor.position.y = -1.0;
-
         let cone1 = this.createCone("test", true);
 
-        cone1.scale.set(5,5,5);
         cone1.translateY(5);
         this.scene.add(cone1);
-        this.scene.add( physObj );
-        this.objects.push( physObj );
         this.objects.push(cone1);
+
     }
 
-    onKeyDown( event ) {
-        switch ( event.keyCode ) {
-            case 38: // up
-            case 87: // w
-                this.moveForward = true;
-                break;
-            case 37: // left
-            case 65: // a
-                this.moveLeft = true;
-                break;
-            case 40: // down
-            case 83: // s
-                this.moveBackward = true;
-                break;
-            case 39: // right
-            case 68: // d
-                this.moveRight = true;
-                break;
-            case 32: // space
-                if ( this.canJump === true ) this.velocity.y += 350;
-                this.canJump = false;
-                break;
-            case 16: // shift
-                this.moveSpeed = 1;
-                break;
+    onKeyDown(event) {
+        for (let k in this.keys) {
+
+            if (event.keyCode === this.keys[k].code) {
+
+                this.keys[k].isPressed = true;
+            }
+
         }
     }
 
-    onKeyUp( event ) {
-        switch ( event.keyCode ) {
-            case 38: // up
-            case 87: // w
-                this.moveForward = false;
-                break;
-            case 37: // left
-            case 65: // a
-                this.moveLeft = false;
-                break;
-            case 40: // down
-            case 83: // s
-                this.moveBackward = false;
-                break;
-            case 39: // right
-            case 68: // d
-                this.moveRight = false;
-                break;
-            case 16: // shift
-                this.moveSpeed = 5;
-                break;
-            case 32:
-                this.canJump = true;
+    onKeyUp(event) {
+        for (let k in this.keys) {
+
+            if (event.keyCode === this.keys[k].code) {
+
+                this.keys[k].isPressed = false;
+            }
+
         }
     }
 
-    terrainHeightLoaded(data){
-        this.terrainGeo = new THREE.PlaneBufferGeometry(500, 1000, 511, 1023);
+    addPlayer() {
+        let playerGeo = new THREE.BoxBufferGeometry(5, 5, 5);
+        let playerMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({color: 0xBBBBBB}));
+        let playerMesh = new Physijs.BoxMesh(playerGeo, playerMat, 100);
+        return playerMesh;
+    }
+
+    terrainHeightLoaded(data) {
+        this.terrainGeo = new THREE.PlaneGeometry(2048, 2048, 511, 511);
 
         for (var i = 0, len = this.terrainGeo.vertices.length; i < len; i++) {
-            terrainGeo.vertices[i].z = data[i] / 3;
+            this.terrainGeo.vertices[i].z = data[i] / 3;
         }
 
-        let texMap = THREE.TextureLoader().load("textures/grass_texture.jpg");
+        let texMap = new THREE.TextureLoader().load("textures/grass_texture.jpg");
         texMap.wrapS = THREE.RepeatWrapping;
         texMap.wrapT = THREE.RepeatWrapping;
         texMap.repeat.x = 4;
         texMap.repeat.y = 8;
 
+        this.terrainGeo.rotateX(-Math.PI / 2);
+
         //TODO: Physijs material
+        let physiMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({map: texMap, side: THREE.DoubleSide}));
 
         this.terrainGeo.computeVertexNormals();
         this.terrainGeo.computeFaceNormals();
 
         //TODO: Physijs mesh
+        let physMesh = new Physijs.HeightfieldMesh(this.terrainGeo, physiMat, 0, 511, 511);
 
+
+        this.scene.add(physMesh);
+        this.terranLoaded = true;
         //TODO: Water plane
 
     }
 
-    addTerrain(){
-        getHeightData("textures/heightmap.png", 512, 1024, this.terrainHeightLoaded);
+    addTerrain() {
+        getHeightData("textures/heightmap2.png", 512, 1024, this.terrainHeightLoaded.bind(this));
     }
 
-    clearThree(obj){
-        while(obj.children.length > 0){
-            this.clearThree(obj.children[0]);
-            obj.remove(obj.children[0]);
-        }
-        if(obj.geometry) obj.geometry.dispose();
-        if(obj.material) obj.material.dispose();
-        if(obj.texture) obj.texture.dispose();
-    }
+    // clearThree(obj){
+    //     while(obj.children.length > 0){
+    //         this.clearThree(obj.children[0]);
+    //         obj.remove(obj.children[0]);
+    //     }
+    //     if(obj.geometry) obj.geometry.dispose();
+    //     if(obj.material) obj.material.dispose();
+    //     if(obj.texture) obj.texture.dispose();
+    // }
 
     setUpSkybox(scene, renderer, camera, skybox) {
         let skyDir = "./textures/skybox" + skybox + "/";
@@ -246,79 +188,108 @@ class Level extends Engine {
     }
 
 
-
     animate(elapsed) {
-        this.scene.simulate();
         requestAnimationFrame(this.animate.bind(this));
+        if (this.terranLoaded) {
 
-        if ( this.controls.isLocked === true ) {
-            this.raycaster.ray.origin.copy( this.controls.getObject().position );
-            this.raycaster.ray.origin.y -= 10;
-            var intersections = this.raycaster.intersectObjects( this.objects );
-            var onObject = intersections.length > 0;
-            var time = performance.now();
-            var delta = ( time - this.prevTime ) / 1000;
-            this.velocity.x -= this.velocity.x * this.moveSpeed * delta;
-            this.velocity.z -= this.velocity.z * this.moveSpeed * delta;
-            this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
-            this.direction.z = Number( this.moveForward ) - Number( this.moveBackward );
-            this.direction.x = Number( this.moveLeft ) - Number( this.moveRight );
-            this.direction.normalize(); // this ensures consistent movements in all directions
-            if ( this.moveForward || this.moveBackward ) this.velocity.z -= this.direction.z * 400.0 * delta;
-            if ( this.moveLeft || this.moveRight ) this.velocity.x -= this.direction.x * 400.0 * delta;
-            if ( onObject === true ) {
-                this.velocity.y = Math.max( 0, this.velocity.y );
-            }
-            this.controls.getObject().translateX( this.velocity.x * delta );
-            this.controls.getObject().translateY( this.velocity.y * delta );
-            this.controls.getObject().translateZ( this.velocity.z * delta );
-            // if ( this.controls.getObject().position.y < 10 ) {
-            //     this.velocity.y = 0;
-            //     this.controls.getObject().position.y = 10;
-            //     this.canJump = true;
-            // }
-            this.prevTime = time;
+            this.animateFire();
+
+            this.updatePlayerPos(this.clock.getDelta()/10);
+            this.updateCamera();
+
+
+            this.scene.simulate();
+            this.render();
         }
-        this.animateFire();
+    }
 
-        this.render();
+    updateCamera() {
+        this.controls.target.copy(this.player.position);
+        // this.controls.target.y += this.player.geometry.boundingSphere.radius * 2;
+        this.controls.update();
+
+        let camOffset = this.camera.position.clone().sub(this.controls.target);
+        camOffset.normalize().multiplyScalar(100);
+        let pos = this.controls.target.clone().add(camOffset);
+        this.camera.position.set(pos.x, pos.y, pos.z);
+    }
+
+    updatePlayerPos(delta) {
+        let newSpeed = this.playerSpeed;
+
+        if (this.keys.UP.isPressed || this.keys.W.isPressed) {
+            newSpeed += delta;
+            this.player.__dirtyPosition = true;
+            this.player.__dirtyRotation = true;
+        } else
+            newSpeed -= delta;
+
+        newSpeed = Math.min(1, Math.max(newSpeed, 0));
+
+        if (this.keys.LEFT.isPressed || this.keys.A.isPressed) {
+            this.player.rotation.y += delta * 2;
+            this.player.__dirtyRotation = true;
+            this.player.__dirtyPosition = true;
+        } else if (this.keys.RIGHT.isPressed || this.keys.D.isPressed) {
+            this.player.rotation.y -= delta * 2;
+            this.player.__dirtyPosition = true;
+            this.player.__dirtyRotation = true;
+        }
+
+        let forward = new THREE.Vector3(-this.player.matrixWorld.elements[8],
+            -this.player.matrixWorld.elements[9],
+            -this.player.matrixWorld.elements[10]);
+        let finalSpeed = (newSpeed > 0.5) ? newSpeed * this.runSpeed : (newSpeed / 0.5) * this.walkSpeed;
+
+
+        this.playerSpeed = newSpeed;
+        this.player.position.add(forward.multiplyScalar(finalSpeed));
+
+
+        console.log("Player position is " + this.player.position.x + " : " + this.player.position.z)
     }
 
     render() {
         super.render();
     }
 
-    createCone(name, hazard){
+    createCone(name, hazard) {
         let texLoader = new THREE.TextureLoader();
         let top = texLoader.load("textures/platform_top_texture.png");
         let sides = texLoader.load("textures/platform_side_texture.png");
         sides.center = new THREE.Vector2(0.5, 0.5);
-        sides.rotation = Math.PI/2;
+        sides.rotation = Math.PI / 2;
 
         let matArr = [
-            new THREE.MeshPhongMaterial({map:sides, side: THREE.DoubleSide}),
-            new THREE.MeshPhongMaterial({map:sides, side: THREE.DoubleSide}),
-            new THREE.MeshPhongMaterial({map:top, side: THREE.DoubleSide}),
+            new THREE.MeshLambertMaterial({map: sides, side: THREE.DoubleSide}),
+            new THREE.MeshLambertMaterial({map: sides, side: THREE.DoubleSide}),
+            new THREE.MeshLambertMaterial({map: top, side: THREE.DoubleSide}),
         ];
 
-        let platformGeo = new THREE.ConeBufferGeometry(10, 25, 12);
+        let physiMat = new Physijs.createMaterial(new THREE.MeshBasicMaterial());
+        physiMat.visible = false;
+        let platformGeo = new THREE.ConeBufferGeometry(5 * 10, 5 * 25, 5 * 12);
+        let physiMesh = new Physijs.ConeMesh(platformGeo, physiMat, 0);
+        physiMat.visible = false;
         let platformMesh = new THREE.Mesh(platformGeo, matArr);
-        platformMesh.name = "cone:" + name;
         platformMesh.rotation.x = Math.PI;
+        physiMesh.add(platformMesh);
+        platformMesh.position.y = -1.0;
+        platformMesh.name = "cone:" + name;
         platformMesh.castShadow = true;
         platformMesh.receiveShadow = true;
 
-        if(hazard === true){
+        if (hazard === true) {
             platformMesh.add(this.addHazard(name));
         } else {
             platformMesh.add(this.addCoin(name));
         }
 
-        return platformMesh;
+        return physiMesh;
 
     }
 
-    addCoin(name){
+    addCoin(name) {
         let texLoader = new THREE.TextureLoader();
 
         let spriteTex = texLoader.load("textures/coin_texture.png");
@@ -327,19 +298,19 @@ class Level extends Engine {
         let coin = new THREE.Sprite(matSprite);
         coin.name = "hazard:" + name;
         coin.scale.set(5, 5, 5);
-        coin.position.set(5,-20,0);
+        coin.position.set(5, -20, 0);
         coin.updateMatrix();
 
         return coin;
     }
 
-    addHazard(name){
+    addHazard(name) {
         let texLoader = new THREE.TextureLoader();
 
         let spriteTex = texLoader.load("textures/fire_grid.png");
 
         spriteTex.wrapS = spriteTex.wrapT = THREE.RepeatWrapping;
-        spriteTex.repeat = new THREE.Vector2(1/8, 1/4);
+        spriteTex.repeat = new THREE.Vector2(1 / 8, 1 / 4);
         spriteTex.name = "fire_texture";
 
         let matSprite = new THREE.SpriteMaterial({
@@ -348,19 +319,19 @@ class Level extends Engine {
 
         let haz = new THREE.Sprite(matSprite);
         haz.name = "haz:" + name;
-        haz.scale.set(20, 20, 20);
-        haz.position.set(-5,-20,0);
+        haz.scale.set(50, 50, 50);
+        haz.position.set(-25, -100, 0);
         haz.updateMatrix();
         this.fires.push(spriteTex);
 
         return haz;
     }
 
-    animateFire(){
+    animateFire() {
         for (let i = 0; i < this.fires.length; i++) {
-            this.fire_frame = (this.fire_frame + 1) % (4*8);
-            let u = 1/8 * (this.fire_frame % 8);
-            let v = 1/4 * Math.floor(this.fire_frame / 8);
+            this.fire_frame = (this.fire_frame + 1) % (4 * 8);
+            let u = 1 / 8 * (this.fire_frame % 8);
+            let v = 1 / 4 * Math.floor(this.fire_frame / 8);
 
             let haz = this.fires[i];
 
@@ -381,7 +352,5 @@ class Level extends Engine {
         this.render();
     }
 
-    setUpPlayer() {
 
-    }
 }
