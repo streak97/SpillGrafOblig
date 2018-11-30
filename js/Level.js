@@ -296,7 +296,7 @@ class Level extends Engine {
 
         if (hazard === true) {
             platformMesh.add(this.addHazard(name));
-        } else {
+        } else if(hazard === false){
             platformMesh.add(this.addCoin(name));
         }
 

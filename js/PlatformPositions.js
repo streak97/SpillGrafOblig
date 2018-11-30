@@ -10,7 +10,7 @@ function setPlatformPositions(){
             x: 0,
             y: 0,
             z: 0,
-            haz: false
+            haz: null
         },
         {
             x: 10,
