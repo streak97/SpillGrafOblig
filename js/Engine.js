@@ -19,6 +19,9 @@ class Engine{
 
         this.camera = null;
         this.mouse = new THREE.Vector2();
+
+        this.stats = new Stats();
+        document.body.appendChild(this.stats.dom);
     }
 
     setState(state){
@@ -26,6 +29,7 @@ class Engine{
     }
 
     render(){
+        this.stats.update();
         this.renderer.render(this.scene, this.camera);
     }
 }
