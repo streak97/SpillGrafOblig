@@ -7,9 +7,12 @@ class Level extends Engine {
     constructor(scene, renderer) {
         Physijs.scripts.worker = './lib/physijs_worker.js';
         Physijs.scripts.ammo = './ammo.js';
+
         scene = new Physijs.Scene({fixedTimeStep: 1 / 8});
+
         super(scene, renderer);
         this.scene.setGravity(new THREE.Vector3(0, -10, 0));
+
         // Player
         this.player = null;
         this.terranLoaded = false;
@@ -40,6 +43,8 @@ class Level extends Engine {
 
         this.fire_frame = 1;
         this.fires = [];
+
+        this.plat_pos = [];
     }
 
     start(level) {
@@ -186,7 +191,7 @@ class Level extends Engine {
 
 
     animate(elapsed) {
-        if(this.keys.F.isPressed){
+        if (this.keys.F.isPressed) {
             new Main_Menu(new THREE.Scene(), this.renderer).start();
             return;
         }
@@ -197,7 +202,7 @@ class Level extends Engine {
 
             this.animateFire();
             this.updateCamera();
-            this.updatePlayerPos(this.clock.getDelta()/10);
+            this.updatePlayerPos(this.clock.getDelta() / 10);
 
 
             this.render();
@@ -254,6 +259,7 @@ class Level extends Engine {
     createCone(name, hazard) {
         let texLoader = new THREE.TextureLoader();
         let top = texLoader.load("textures/platform_top_texture.png");
+
         let sides = texLoader.load("textures/platform_side_texture.png");
         sides.center = new THREE.Vector2(0.5, 0.5);
         sides.rotation = Math.PI / 2;
@@ -266,12 +272,16 @@ class Level extends Engine {
 
         let physiMat = new Physijs.createMaterial(new THREE.MeshBasicMaterial());
         physiMat.visible = false;
+
         let platformGeo = new THREE.ConeBufferGeometry(5 * 10, 5 * 25, 5 * 12);
+
         let physiMesh = new Physijs.CylinderMesh(platformGeo, physiMat, 0);
         physiMat.visible = false;
+
         let platformMesh = new THREE.Mesh(platformGeo, matArr);
         platformMesh.rotation.x = Math.PI;
         physiMesh.add(platformMesh);
+
         platformMesh.position.y = -1.0;
         platformMesh.name = "cone:" + name;
         platformMesh.castShadow = true;
@@ -294,6 +304,7 @@ class Level extends Engine {
         let matSprite = new THREE.SpriteMaterial({map: spriteTex});
 
         let coin = new THREE.Sprite(matSprite);
+
         coin.name = "hazard:" + name;
         coin.scale.set(5, 5, 5);
         coin.position.set(5, -20, 0);
@@ -327,7 +338,9 @@ class Level extends Engine {
 
     animateFire() {
         for (let i = 0; i < this.fires.length; i++) {
+
             this.fire_frame = (this.fire_frame + 1) % (4 * 8);
+
             let u = 1 / 8 * (this.fire_frame % 8);
             let v = 1 / 4 * Math.floor(this.fire_frame / 8);
 
@@ -349,5 +362,21 @@ class Level extends Engine {
         this.render();
     }
 
+    setPlatformPositions(){
+        this.plat_pos = [
+            {
+                x: 0,
+                y: 0,
+                z: 0,
+                haz: false
+            },
+            {
+                x: 10,
+                y: 0,
+                z: 1,
+                haz: false
+            },
+        ];
+    }
 
 }
