@@ -1,4 +1,8 @@
-
+/**
+ * @author Jakob Overrein
+ *
+ * Coordinates and type of platforms to be placed in level
+ * */
 
 function setPlatformPositions(){
     return [

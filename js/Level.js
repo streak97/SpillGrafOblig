@@ -1,6 +1,6 @@
-/**@author Alexander Erlingsen
+/**@author Alexander Erlingsen og Jakob Overrein
  *
- *
+ *  Sets up manages the logic og the playable level
  */
 class Level extends Engine {
 

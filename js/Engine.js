@@ -1,3 +1,9 @@
+/**
+ * @author Jakob Overrein
+ *
+ * Intended for common functions, not majorly used
+ */
+
 "use strict";
 class Engine{
 

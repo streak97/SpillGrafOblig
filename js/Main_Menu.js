@@ -1,6 +1,6 @@
 /** @author Jakob Overrein
  *
- * Displays and handles the main menu
+ * Displays and handles the menu screens
  */
 
 class Main_Menu extends Engine {
