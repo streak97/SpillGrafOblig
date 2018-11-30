@@ -225,18 +225,15 @@ class Main_Menu extends Engine {
                     new Level(new Physijs.Scene({fixedTimeStep: 1/60}), this.renderer).start(1);
                     break;
                 case "Options":
-                    super.setState(this.STATE_GAME);
                     console.log(opt);
                     break;
                 case "Info":
-                    super.setState(this.STATE_GAME);
                     this.saved_scene = scene;
                     this.scene.getObjectByName("music").stop();
                     this.scene = this.info_scene;
                     console.log(opt);
                     break;
                 case "Back":
-                    super.setState(this.STATE_GAME);
                     this.scene = this.saved_scene;
                     this.scene.getObjectByName("music").play();
                     console.log(opt);
