@@ -61,10 +61,10 @@ class Level extends Engine {
         this.camera.lookAt(0, 0, 0);
 
         this.controls = new THREE.OrbitControls(this.camera);
-        this.controls.autoRotate = true;
+        this.controls.autoRotate = false;
         this.controls.target = this.player.position;
 
-        this.player.position.set(0, 130, 0);
+        this.player.position.set(0, 100, 0);
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.position.set(new THREE.Vector3(50, 250, 20));
@@ -93,7 +93,6 @@ class Level extends Engine {
         for (let k in this.keys) {
 
             if (event.keyCode === this.keys[k].code) {
-
                 this.keys[k].isPressed = true;
             }
 
@@ -104,7 +103,6 @@ class Level extends Engine {
         for (let k in this.keys) {
 
             if (event.keyCode === this.keys[k].code) {
-
                 this.keys[k].isPressed = false;
             }
 
@@ -114,7 +112,7 @@ class Level extends Engine {
     addPlayer() {
         let playerGeo = new THREE.BoxBufferGeometry(5, 5, 5);
         let playerMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({color: 0xBBBBBB}));
-        let playerMesh = new Physijs.BoxMesh(playerGeo, playerMat, 100);
+        let playerMesh = new Physijs.CapsuleMesh(playerGeo, playerMat, 100);
         return playerMesh;
     }
 
@@ -195,14 +193,13 @@ class Level extends Engine {
         requestAnimationFrame(this.animate.bind(this));
 
         if (this.terranLoaded) {
+            this.scene.simulate();
 
             this.animateFire();
-
-            this.updatePlayerPos(this.clock.getDelta()/10);
             this.updateCamera();
+            this.updatePlayerPos(this.clock.getDelta()/10);
 
 
-            this.scene.simulate();
             this.render();
         }
     }
@@ -231,11 +228,11 @@ class Level extends Engine {
         newSpeed = Math.min(1, Math.max(newSpeed, 0));
 
         if (this.keys.LEFT.isPressed || this.keys.A.isPressed) {
-            this.player.rotation.y += delta * 2;
+            this.player.rotation.y += delta * 5;
             this.player.__dirtyRotation = true;
             this.player.__dirtyPosition = true;
         } else if (this.keys.RIGHT.isPressed || this.keys.D.isPressed) {
-            this.player.rotation.y -= delta * 2;
+            this.player.rotation.y -= delta * 5;
             this.player.__dirtyPosition = true;
             this.player.__dirtyRotation = true;
         }
@@ -248,9 +245,6 @@ class Level extends Engine {
 
         this.playerSpeed = newSpeed;
         this.player.position.add(forward.multiplyScalar(finalSpeed));
-
-
-        console.log("Player position is " + this.player.position.x + " : " + this.player.position.z)
     }
 
     render() {
@@ -273,7 +267,7 @@ class Level extends Engine {
         let physiMat = new Physijs.createMaterial(new THREE.MeshBasicMaterial());
         physiMat.visible = false;
         let platformGeo = new THREE.ConeBufferGeometry(5 * 10, 5 * 25, 5 * 12);
-        let physiMesh = new Physijs.ConeMesh(platformGeo, physiMat, 0);
+        let physiMesh = new Physijs.CylinderMesh(platformGeo, physiMat, 0);
         physiMat.visible = false;
         let platformMesh = new THREE.Mesh(platformGeo, matArr);
         platformMesh.rotation.x = Math.PI;
