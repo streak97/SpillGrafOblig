@@ -19,7 +19,8 @@ class Level extends Engine {
             RIGHT: {code: 39, isPressed: false},
             A: {code: 65, isPressed: false},
             D: {code: 68, isPressed: false},
-            W: {code: 87, isPressed: false}
+            W: {code: 87, isPressed: false},
+            F: {code: 70, isPressed: false}
         };
 
         this.raycaster = null;
@@ -132,13 +133,11 @@ class Level extends Engine {
 
         this.terrainGeo.rotateX(-Math.PI / 2);
 
-        //TODO: Physijs material
         let physiMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({map: texMap, side: THREE.DoubleSide}));
 
         this.terrainGeo.computeVertexNormals();
         this.terrainGeo.computeFaceNormals();
 
-        //TODO: Physijs mesh
         let physMesh = new Physijs.HeightfieldMesh(this.terrainGeo, physiMat, 0, 511, 511);
 
 
@@ -189,7 +188,12 @@ class Level extends Engine {
 
 
     animate(elapsed) {
+        if(this.keys.F.isPressed){
+            new Main_Menu(new THREE.Scene(), this.renderer).start();
+            return;
+        }
         requestAnimationFrame(this.animate.bind(this));
+
         if (this.terranLoaded) {
 
             this.animateFire();
@@ -339,7 +343,6 @@ class Level extends Engine {
             haz.offset.y = v;
             haz.needsUpdate = true;
         }
-        this.render();
     }
 
     onWindowResize() {
