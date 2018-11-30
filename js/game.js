@@ -1,10 +1,9 @@
-/***
+/**
  * @author Jakob Overrein
  *
  * Starts the game
  *
  */
-/
 
 "use strict";
 let scene, renderer;
