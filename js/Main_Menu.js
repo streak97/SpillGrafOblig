@@ -57,8 +57,8 @@ class Main_Menu extends Engine {
         this.raycaster = new THREE.Raycaster();
         let INTERSECTED;
 
-        this.clickistener = document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
-        this.movelistener = document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
+        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), true);
+        document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
 
     }
 
