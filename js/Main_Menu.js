@@ -8,6 +8,8 @@ class Main_Menu extends Engine {
     constructor(scene, renderer) {
         super(scene, renderer);
 
+        this.GAME_STATE = this.STATE_GAME;
+
         this.objects = [];
 
         this.raycaster = null;
