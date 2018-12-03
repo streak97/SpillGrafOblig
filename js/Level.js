@@ -6,7 +6,6 @@ class Level extends Engine {
     //TODO: Physics rework
     //TODO: End screen
     //TODO: Collision detection(points)
-    //TODO: HUD
 
     constructor(scene, renderer) {
         Physijs.scripts.worker = './lib/physijs_worker.js';

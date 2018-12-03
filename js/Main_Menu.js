@@ -8,21 +8,23 @@ class Main_Menu extends Engine {
     constructor(scene, renderer) {
         super(scene, renderer);
 
-        this.GAME_STATE = this.STATE_GAME;
-
         this.objects = [];
 
         this.raycaster = null;
         this.active = false;
         this.info_scene = new THREE.Scene();
+        this.end_scene = new THREE.Scene();
         this.saved_scene = scene;
     }
 
-    start(){
+    start(ending){
         this.active = true;
         this.setupScene();
 
         this.setupInfoScene();
+        if(ending === "winner" || ending === "loser"){
+            this.setupEndScene(ending);
+        }
         this.menuObjects();
         this.animate();
     }
@@ -71,6 +73,27 @@ class Main_Menu extends Engine {
         back_opt.translateY(150);
         this.info_scene.add(back_opt);
         this.objects.push(back_opt);
+    }
+
+    setupEndScene(ending){
+        this.end_scene = this.scene.clone();
+
+        let text = "Winner!!!!";
+        if(ending === "loser"){
+            text = "You lost"
+        }
+
+        let infoBoard = this.createOption(text);
+        infoBoard.translateY(250);
+        this.end_scene.add(infoBoard);
+
+        let back_opt = this.createOption("Back");
+        back_opt.translateY(150);
+        this.end_scene.add(back_opt);
+        this.objects.push(back_opt);
+
+        this.saved_scene = this.scene;
+        this.scene = this.end_scene;
     }
 
     menuObjects(){
