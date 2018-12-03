@@ -4,7 +4,6 @@
  */
 class Level extends Engine {
     //TODO: Physics rework
-    //TODO: End screen
     //TODO: Collision detection(points)
 
     constructor(scene, renderer) {
