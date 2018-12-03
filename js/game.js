@@ -8,7 +8,7 @@
 "use strict";
 let scene, renderer;
 
-function play(){
+game.play = function (){
     Physijs.scripts.worker = './lib/physijs_worker.js';
     Physijs.scripts.ammo = './lib/ammo.js';
     const canvas = document.getElementById("canvas");

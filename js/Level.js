@@ -3,7 +3,6 @@
  *  Sets up manages the logic og the playable level
  */
 class Level extends Engine {
-    //TODO: Physics rework
     //TODO: Collision detection(points)
 
     constructor(scene, renderer) {
@@ -19,12 +18,11 @@ class Level extends Engine {
         this.player = null;
         this.terranLoaded = false;
         this.keys = {
-            LEFT: {code: 37, isPressed: false},
-            UP: {code: 38, isPressed: false},
-            RIGHT: {code: 39, isPressed: false},
             A: {code: 65, isPressed: false},
             D: {code: 68, isPressed: false},
             W: {code: 87, isPressed: false},
+            S: {code: 83, isPressed: false},
+            Space: {code: 32, isPressed: false},
             F: {code: 70, isPressed: false}
         };
 
@@ -42,6 +40,10 @@ class Level extends Engine {
         this.vertex = new THREE.Vector3();
         this.color = new THREE.Color();
         this.terrainGeo = null;
+        // Variabler for fysikk og player control
+        this._cannon = window.game.cannon();
+        this._cannon.init(this);
+        this._helpers = window.game.helpers;
 
         this.fire_frame = 1;
         this.fires = [];
@@ -50,7 +52,9 @@ class Level extends Engine {
     }
 
     start(level) {
-        this.player = this.addPlayer();
+        this.player = Player();
+        this.player.level = this;
+        this.player.size = 5;
         this.setUpScene();
 
         this.setupHUD();
@@ -71,19 +75,13 @@ class Level extends Engine {
         this.camera.position.set(-30, 150, 150);
         this.camera.lookAt(0, 0, 0);
 
-        this.controls = new THREE.OrbitControls(this.camera);
-        this.controls.autoRotate = false;
-        this.controls.target = this.player.position;
-
-        this.player.position.set(0, 100, 0);
+        this.player.create();
 
         let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.position.set(new THREE.Vector3(50, 250, 20));
         directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
         directionalLight.castShadow = true;
         this.scene.add(directionalLight);
-
-        this.scene.add(this.player);
 
         let ambientLight = new THREE.AmbientLight("#CCCCCC");
         this.scene.add(ambientLight);
@@ -101,12 +99,10 @@ class Level extends Engine {
             let val = this.plat_pos[i];
             let cone = this.createCone(i, val.haz);
 
-            cone.translateX(val.x*10);
-            cone.translateY(val.y*10);
-            cone.translateZ(val.z*10);
+            cone.position.set(val.x*10, val.y*10, val.z*10);
+            // cone.translateY(val.y*10);
+            // cone.translateZ(val.z*10);
 
-            this.scene.add(cone);
-            this.objects.push(cone);
         }
 
     }
@@ -131,14 +127,6 @@ class Level extends Engine {
         }
     }
 
-    addPlayer() {
-        let playerGeo = new THREE.BoxBufferGeometry(5, 5, 5);
-        let playerMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({color: 0xBBBBBB}));
-        let playerMesh = new Physijs.CapsuleMesh(playerGeo, playerMat, 100);
-
-        return playerMesh;
-    }
-
     terrainHeightLoaded(data) {
         this.terrainGeo = new THREE.PlaneGeometry(2048, 2048, 511, 511);
 
@@ -154,7 +142,7 @@ class Level extends Engine {
 
         this.terrainGeo.rotateX(-Math.PI / 2);
 
-        let physiMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({map: texMap, side: THREE.DoubleSide}));
+        let physiMat = this._cannon.createPhysicsMaterial(new THREE.MeshLambertMaterial({map: texMap, side: THREE.DoubleSide}));
 
         this.terrainGeo.computeVertexNormals();
         this.terrainGeo.computeFaceNormals();
@@ -229,62 +217,29 @@ class Level extends Engine {
         requestAnimationFrame(this.animate.bind(this));
 
         if (this.terranLoaded) {
-            this.scene.simulate();
+            this._cannon.updatePhysics();
 
-            this.animateFire();
+            this.player.update();
             this.updateCamera();
-            this.updatePlayerPos(this.clock.getDelta() / 10);
+            this.animateFire();
             this.updateHP();
 
             this.render();
         }
     }
 
-    updateCamera() {
-        this.controls.target.copy(this.player.position);
-        // this.controls.target.y += this.player.geometry.boundingSphere.radius * 2;
-        this.controls.update();
-
-        let camOffset = this.camera.position.clone().sub(this.controls.target);
-        camOffset.normalize().multiplyScalar(100);
-        let pos = this.controls.target.clone().add(camOffset);
-        this.camera.position.set(pos.x, pos.y, pos.z);
-    }
-
-    updatePlayerPos(delta) {
-        let newSpeed = this.playerSpeed;
-
-        if (this.keys.UP.isPressed || this.keys.W.isPressed) {
-            newSpeed += delta;
-            this.player.__dirtyPosition = true;
-            this.player.__dirtyRotation = true;
-        } else
-            newSpeed -= delta;
-
-        newSpeed = Math.min(1, Math.max(newSpeed, 0));
-
-        if (this.keys.LEFT.isPressed || this.keys.A.isPressed) {
-            this.player.rotation.y += delta * 5;
-            this.player.__dirtyRotation = true;
-            this.player.__dirtyPosition = true;
-        } else if (this.keys.RIGHT.isPressed || this.keys.D.isPressed) {
-            this.player.rotation.y -= delta * 5;
-            this.player.__dirtyPosition = true;
-            this.player.__dirtyRotation = true;
-        }
-
-        let forward = new THREE.Vector3(-this.player.matrixWorld.elements[8],
-            -this.player.matrixWorld.elements[9],
-            -this.player.matrixWorld.elements[10]);
-        let finalSpeed = (newSpeed > 0.5) ? newSpeed * this.runSpeed : (newSpeed / 0.5) * this.walkSpeed;
-
-
-        this.playerSpeed = newSpeed;
-        this.player.position.add(forward.multiplyScalar(finalSpeed));
-    }
-
     render() {
         super.render();
+    }
+
+    updateCamera() {
+        this.player.cameraCoords = this._helpers.polarToCartesian(this.player.cameraOffsetH, this.player.rotationRadians.y);
+
+        this.camera.position.x = this.player.mesh.position.x + this.player.cameraCoords.x;
+        this.camera.position.y = this.player.mesh.position.y + this.player.cameraOffsetV;
+        this.camera.position.z = this.player.mesh.position.z + this.player.cameraCoords.z;
+
+        this.camera.lookAt(this.player.mesh.position);
     }
 
     createCone(name, hazard) {
@@ -301,19 +256,18 @@ class Level extends Engine {
             new THREE.MeshLambertMaterial({map: top, side: THREE.DoubleSide}),
         ];
 
-        let physiMat = new Physijs.createMaterial(new THREE.MeshBasicMaterial());
-        physiMat.visible = false;
-
         let platformGeo = new THREE.ConeBufferGeometry(5 * 10, 5 * 25, 5 * 12);
 
-        let physiMesh = new Physijs.CylinderMesh(platformGeo, physiMat, 0);
-        physiMat.visible = false;
+        let halfextents = this.createCannonHalfExtents(platformGeo);
 
         let platformMesh = new THREE.Mesh(platformGeo, matArr);
-        platformMesh.rotation.x = Math.PI;
-        physiMesh.add(platformMesh);
+        let shape = new CANNON.Box(halfextents);
 
-        platformMesh.position.y = -1.0;
+        let rigidBody = new CANNON.RigidBody(
+            0,
+            shape,
+            this._cannon.createPhysicsMaterial(new CANNON.Material("solidMaterial"), 0, 0.1)
+        );
         platformMesh.name = "cone:" + name;
         platformMesh.castShadow = true;
         platformMesh.receiveShadow = true;
@@ -323,8 +277,9 @@ class Level extends Engine {
         } else if(hazard === false){
             platformMesh.add(this.addCoin(name));
         }
-
-        return physiMesh;
+        let mesh = this._cannon.addVisual(rigidBody, null, platformMesh);
+        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0), Math.PI);
+        return rigidBody;
 
     }
 
@@ -393,4 +348,36 @@ class Level extends Engine {
         this.render();
     }
 
+    // hentet fra biblitoeket levert av Matthias Schuetz
+    createCannonHalfExtents(geometry) {
+        // The final bounding box also exsists so get its dimensions
+        geometry.computeBoundingBox();
+
+        // Return a Cannon vector to define the halfExtents
+        return new CANNON.Vec3(
+            (geometry.boundingBox.max.x - geometry.boundingBox.min.x) * 0.5,
+            (geometry.boundingBox.max.y - geometry.boundingBox.min.y) * 0.5,
+            (geometry.boundingBox.max.z - geometry.boundingBox.min.z) * 0.5
+        );
+    }
+
+    createCannonGeometry(geometry, scale) {
+        // Preparre translation properties
+        var translateX;
+        var translateY;
+        var translateZ;
+
+        // Get the bounding box for the provided geometry
+        geometry.computeBoundingBox();
+
+        // Center the imported model so the axis-aligned bounding boxes (AABB) and bounding spheres are generated correctly by Cannon.js
+        translateX = -((geometry.boundingBox.size().x / 2) + geometry.boundingBox.min.x);
+        translateY = -((geometry.boundingBox.size().y / 2) + geometry.boundingBox.min.y);
+        translateZ = -((geometry.boundingBox.size().z / 2) + geometry.boundingBox.min.z);
+
+        // Apply various matrix transformations to translate, rotate and scale the imported model for the Cannon.js coordinate system
+        geometry.applyMatrix(new THREE.Matrix4().makeTranslation(translateX, translateY, translateZ));
+        geometry.applyMatrix(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2));
+        geometry.applyMatrix(new THREE.Matrix4().makeScale(scale, scale, scale));
+    }
 }

@@ -13,19 +13,19 @@ function setPlatformPositions(){
             haz: null
         },
         {
-            x: 10,
+            x: 20,
             y: 0,
             z: 1,
             haz: false
         },
         {
-            x: 20,
+            x: 35,
             y: 4,
             z: -5,
             haz: true
         },
         {
-            x: 20,
+            x: 35,
             y: 4,
             z: 5,
             haz: false

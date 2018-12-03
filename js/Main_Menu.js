@@ -247,7 +247,7 @@ class Main_Menu extends Engine {
                     this.scene.getObjectByName("music").stop();
                     console.log(opt);
                     this.removeListeners();
-                    new Level(new Physijs.Scene({fixedTimeStep: 1/60}), this.renderer).start(1);
+                    new Level(new THREE.Scene(), this.renderer).start(1);
                     break;
                 case "Options":
                     console.log(opt);
