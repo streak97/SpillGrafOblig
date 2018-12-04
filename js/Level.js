@@ -5,14 +5,7 @@
 class Level extends Engine {
 
     constructor(scene, renderer) {
-        Physijs.scripts.worker = './lib/physijs_worker.js';
-        Physijs.scripts.ammo = './ammo.js';
-
-        scene = new Physijs.Scene({fixedTimeStep: 1 / 8});
-
         super(scene, renderer);
-        this.scene.setGravity(new THREE.Vector3(0, -10, 0));
-
         // Player
         this.player = null;
         this.terranLoaded = false;
@@ -25,20 +18,8 @@ class Level extends Engine {
             F: {code: 70, isPressed: false}
         };
 
-        this.raycaster = null;
-        this.runSpeed = 7;
-        this.walkSpeed = 3;
-        this.clock = new THREE.Clock();
-        this.canJump = false;
-        this.objects = [];
-        this.playerSpeed = 0;
-
-        this.prevTime = performance.now();
-        this.velocity = new THREE.Vector3();
-        this.direction = new THREE.Vector3();
-        this.vertex = new THREE.Vector3();
-        this.color = new THREE.Color();
         this.terrainGeo = null;
+
         // Variabler for fysikk og player control
         this._cannon = window.game.cannon();
         this._cannon.init(this);
@@ -142,15 +123,12 @@ class Level extends Engine {
 
         this.terrainGeo.rotateX(-Math.PI / 2);
 
-        let physiMat = this._cannon.createPhysicsMaterial(new THREE.MeshLambertMaterial({map: texMap, side: THREE.DoubleSide}));
-
         this.terrainGeo.computeVertexNormals();
         this.terrainGeo.computeFaceNormals();
 
-        let physMesh = new Physijs.HeightfieldMesh(this.terrainGeo, physiMat, 0, 511, 511);
-        physMesh.translateY(-100);
-
-        this.scene.add(physMesh);
+        let grassMesh = new THREE.Mesh(this.terrainGeo, new THREE.MeshLambertMaterial({map: texMap, side: THREE.DoubleSide}));
+        grassMesh.translateY(-100);
+        this.scene.add(grassMesh);
 
         let texWat = new THREE.TextureLoader().load("textures/water_texture.jpg");
         texWat.wrapS = THREE.RepeatWrapping;
@@ -161,16 +139,21 @@ class Level extends Engine {
         let waterGeo = new THREE.PlaneGeometry(2048, 2048);
         waterGeo.rotateX(-Math.PI/2);
 
-        let watPysMat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({map: texWat, side: THREE.DoubleSide, opacity: 0.7}));
-        let watPysMesh = new Physijs.PlaneMesh(waterGeo, watPysMat, 0);
-        watPysMesh.translateY(-85);
+        let watMat = new THREE.MeshLambertMaterial({map: texWat, side: THREE.DoubleSide, opacity: 0.7});
+        let watMesh = new THREE.Mesh(waterGeo, watMat);
+        watMesh.translateY(-85);
 
-        this.scene.add(watPysMesh);
+        this.scene.add(watMesh);
         this.terranLoaded = true;
     }
 
     addTerrain() {
         getHeightData("textures/heightmap2.png", 512, 1024, this.terrainHeightLoaded.bind(this));
+    }
+
+    clearThree(obj){
+        this._cannon.destroy();
+        super.clearThree(obj)
     }
 
     setUpSkybox(scene, renderer, camera, skybox) {
@@ -201,6 +184,7 @@ class Level extends Engine {
 
     animate(elapsed) {
         if(this.player.ended === true){
+            this.clearThree(this.scene);
             new Main_Menu(new THREE.Scene(), this.renderer).start(this.player.endType);
             return;
         }

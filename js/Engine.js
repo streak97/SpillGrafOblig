@@ -95,4 +95,15 @@ class Engine{
         this.stats.update();
         this.renderer.render(this.scene, this.camera);
     }
+
+    clearThree(obj){
+        while(obj.children.length > 0){
+            this.clearThree(obj.children[0]);
+            obj.remove(obj.children[0]);
+        }
+        if(obj.geometry) obj.geometry.dispose();
+        if(obj.material) obj.material.dispose();
+        if(obj.texture) obj.texture.dispose();
+        if (obj.camera) obj.camera.dispose();
+    }
 }

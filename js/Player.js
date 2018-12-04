@@ -147,23 +147,9 @@ Player = function () {
                 player.accelerate();
                 player.rotate();
                 player.event();
-                //player.updateCamera();
 
                 // Level logikk
                 player.checkGameOver();
-            }
-            ,
-            updateCamera: function () {
-                // kalkuler kamerakoordinater
-                player.cameraCoords = player.level._helpers.polarToCartesian(player.cameraOffsetH, player.rotationRadians.y);
-
-                // Set camera til posisjon
-                player.level.camera.position.x = player.mesh.position.x + player.cameraCoords.x;
-                player.level.camera.position.y = player.mesh.position.y + player.cameraOffsetV;
-                player.level.camera.position.z = player.mesh.position.z + player.cameraCoords.z;
-
-                // Sett camerafocus til spiller
-                player.level.camera.lookAt(player.mesh.position);
             }
             ,
             updateAcceleration: function (values, direction) {
@@ -176,7 +162,7 @@ Player = function () {
                             player[values.acceleration] -= player[values.speed];
                         }
                     } else {
-                        player[values.acceleration] += player[values.speedMax];
+                        player[values.acceleration] = -player[values.speedMax];
                     }
                 } else {
                     // bak og venstre
