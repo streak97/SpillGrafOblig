@@ -57,7 +57,7 @@ class Main_Menu extends Engine {
         this.raycaster = new THREE.Raycaster();
         let INTERSECTED;
 
-        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), true);
+        document.addEventListener("mousedown", this.onDocumentMouseDown.bind(this), false);
         document.addEventListener( "mousemove", this.onDocumentMouseMove.bind(this), false );
 
     }
@@ -235,34 +235,36 @@ class Main_Menu extends Engine {
     onDocumentMouseDown(e){
         e.preventDefault();
 
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        let intersects = this.raycaster.intersectObjects(this.objects);
+        if (!(this.objects === null)) {
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            let intersects = this.raycaster.intersectObjects(this.objects);
 
-        if (intersects.length > 0) {
-            let opt = intersects[0].object.name.split(":")[1];
-            switch (opt) {
-                case "Start":
-                    super.setState(this.STATE_GAME);
-                    this.active = false;
-                    this.scene.getObjectByName("music").stop();
-                    console.log(opt);
-                    this.removeListeners();
-                    new Level(new THREE.Scene(), this.renderer).start(1);
-                    break;
-                case "Options":
-                    console.log(opt);
-                    break;
-                case "Info":
-                    this.saved_scene = scene;
-                    this.scene.getObjectByName("music").stop();
-                    this.scene = this.info_scene;
-                    console.log(opt);
-                    break;
-                case "Back":
-                    this.scene = this.saved_scene;
-                    this.scene.getObjectByName("music").play();
-                    console.log(opt);
-                    break;
+            if (intersects.length > 0) {
+                let opt = intersects[0].object.name.split(":")[1];
+                switch (opt) {
+                    case "Start":
+                        super.setState(this.STATE_GAME);
+                        this.active = false;
+                        this.scene.getObjectByName("music").stop();
+                        console.log(opt);
+                        this.clearThree(this.scene);
+                        new Level(new THREE.Scene(), this.renderer).start(1);
+                        break;
+                    case "Options":
+                        console.log(opt);
+                        break;
+                    case "Info":
+                        this.saved_scene = scene;
+                        this.scene.getObjectByName("music").stop();
+                        this.scene = this.info_scene;
+                        console.log(opt);
+                        break;
+                    case "Back":
+                        this.scene = this.saved_scene;
+                        this.scene.getObjectByName("music").play();
+                        console.log(opt);
+                        break;
+                }
             }
         }
     }
@@ -273,9 +275,8 @@ class Main_Menu extends Engine {
         this.mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
     }
 
-    removeListeners() {
-        document.addEventListener('mousedown', function (event)  {
-            event.stopPropagation();
-        }, true);
+    clearThree(obj) {
+        this.objects = null;
+        super.clearThree(obj);
     }
 }
