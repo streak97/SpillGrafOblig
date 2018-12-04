@@ -8,6 +8,7 @@
 "use strict";
 let scene, renderer;
 
+//Starts program
 game.play = function (){
     const canvas = document.getElementById("canvas");
 
@@ -20,8 +21,9 @@ game.play = function (){
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     let menu = new Main_Menu(scene, renderer);
+    //For testing
     let level = new Level(scene, renderer);
 
     menu.start();
 
-}
+};
