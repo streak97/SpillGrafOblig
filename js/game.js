@@ -8,6 +8,7 @@
 "use strict";
 
 
+//Starts program
 game.play = function (){
 
     new Main_Menu().start();

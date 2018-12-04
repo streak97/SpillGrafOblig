@@ -17,6 +17,7 @@ class Main_Menu extends Engine {
         this.saved_scene = this.scene;
     }
 
+    // Starts level
     start(ending){
         this.active = true;
         this.setupScene();
@@ -33,6 +34,7 @@ class Main_Menu extends Engine {
         this.animate();
     }
 
+    //Sets up scene elements
     setupScene(){
         this.camera = new THREE.OrthographicCamera(-200, 200, 200, -200, 1, 500);
 
@@ -66,6 +68,7 @@ class Main_Menu extends Engine {
 
     }
 
+    //Adds a scene element for information screen
     setupInfoScene(){
         this.info_scene = this.scene.clone();
 
@@ -79,6 +82,7 @@ class Main_Menu extends Engine {
         this.objects.push(back_opt);
     }
 
+    //Creates a scene for the ending
     setupEndScene(ending){
         this.end_scene = this.scene.clone();
 
@@ -97,6 +101,7 @@ class Main_Menu extends Engine {
         this.objects.push(back_opt);
     }
 
+    //Creates selectable boxes in main menu
     menuObjects(){
 
         let listener = new THREE.AudioListener();
@@ -136,6 +141,7 @@ class Main_Menu extends Engine {
         this.objects.push(info_opt);
     }
 
+    //Adds background image
     backgroundPlane() {
         let loader = new THREE.TextureLoader();
         let bckTxt = loader.load("textures/skybox1/back.png");
@@ -151,6 +157,7 @@ class Main_Menu extends Engine {
         return planeMesh;
     }
 
+    //Creates a mesh for text boxes
     createOption(text){
         let loader = new THREE.TextureLoader();
         let signTxt = loader.load("textures/Bumpy_Yellow_Diffuse.jpg"); //http://www.bctv.kr/yabc/%EC%97%AC%EA%B8%B0%EC%A3%BC%EC%84%B8%EC%9A%94/%ED%94%84%EB%A6%AC%EB%AF%B8%EC%96%B4_%EC%97%90%ED%8E%99_%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8/TPL_Material-Pack-Element3D-V2/_Material-Pack/Metal/Bumpy_Yellow_Diffuse.jpg
@@ -197,6 +204,7 @@ class Main_Menu extends Engine {
         return signMesh
     }
 
+    //animation for buttons
     animate(){
         if(this.active === true){
             requestAnimationFrame(this.animate.bind(this));
@@ -205,6 +213,7 @@ class Main_Menu extends Engine {
         this.render();
     }
 
+    //Renders scene and detects mouse over buttons
     render(){
         this.raycaster.setFromCamera( this.mouse, this.camera );
 
@@ -224,6 +233,7 @@ class Main_Menu extends Engine {
         super.render();
     }
 
+    //Handles window resize
     onWindowResize() {
 
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -234,6 +244,7 @@ class Main_Menu extends Engine {
         this.render();
     }
 
+    //Detects button clicks
     onDocumentMouseDown(e){
         e.preventDefault();
 
@@ -273,12 +284,14 @@ class Main_Menu extends Engine {
         }
     }
 
+    //Updates mouse position
     onDocumentMouseMove(e){
         e.preventDefault();
         this.mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
         this.mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
     }
 
+    //Clears objects
     clearThree(obj) {
         this.objects = [];
         super.clearThree(obj);
