@@ -31,6 +31,7 @@ class Engine{
 
     }
 
+    //Adds hud features
     setupHUD(){
         let hpGeo = new THREE.PlaneBufferGeometry(10, 1);
 
@@ -49,6 +50,7 @@ class Engine{
         this.writeScore();
     }
 
+    //Adds a score mesh to camera
     writeScore(){
 
         let cam = this.camera;
@@ -77,25 +79,30 @@ class Engine{
         });
     }
 
+    //Updates health bar
     updateHP(){
         let bar = this.camera.getObjectByName("HPbar");
         bar.scale.set(this.hp/100, 1, 1);
     }
 
+    //Removes previous score HUD and replaces it
     updateScore(){
         this.camera.remove(this.camera.getObjectByName("score"));
         this.writeScore();
     }
 
+    //Sets GAME_STATE, not used
     setState(state){
         this.GAME_STATE = state;
     }
 
+    //Renders scene and updates stats
     render(){
         this.stats.update();
         this.renderer.render(this.scene, this.camera);
     }
 
+    //Clears three elements
     clearThree(obj){
         while(obj.children.length > 0){
             this.clearThree(obj.children[0]);
