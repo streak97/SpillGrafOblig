@@ -9,12 +9,17 @@
 "use strict";
 class Engine{
 
-    constructor(scene, renderer){
+    constructor(){
 
-        this.STATE_MENU = 1;
-        this.STATE_GAME = 2;
+        const canvas = document.getElementById("canvas");
 
-        this.GAME_STATE = this.STATE_MENU;
+        let scene = new THREE.Scene();
+
+        let renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
+        renderer.setClearColor(0xFFFFFF, 0xFF);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         this.scene = scene;
         this.renderer = renderer;
@@ -87,23 +92,22 @@ class Engine{
         this.writeScore();
     }
 
-    setState(state){
-        this.GAME_STATE = state;
-    }
-
     render(){
         this.stats.update();
         this.renderer.render(this.scene, this.camera);
     }
 
     clearThree(obj){
+        this.renderer.dispose();
         while(obj.children.length > 0){
-            this.clearThree(obj.children[0]);
+            this.disposeObject(obj.children[0]);
             obj.remove(obj.children[0]);
         }
+    }
+
+    disposeObject(obj) {
         if(obj.geometry) obj.geometry.dispose();
         if(obj.material) obj.material.dispose();
         if(obj.texture) obj.texture.dispose();
-        if (obj.camera) obj.camera.dispose();
     }
 }

@@ -21,7 +21,7 @@ Player = function () {
             ended:
                 false,
             endType:
-                "looser",
+                "loser",
 
             // HingeConstraint to limit player's air-twisting
             orientationConstraint:
@@ -277,7 +277,6 @@ Player = function () {
                 // Avrunde vinkler
                 player.rotationAngleX = Math.round(player.level._helpers.radToDeg(player.rotationRadians.x));
                 player.rotationAngleZ = Math.round(player.level._helpers.radToDeg(player.rotationRadians.z));
-
 
             }
             ,

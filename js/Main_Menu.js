@@ -5,8 +5,8 @@
 
 class Main_Menu extends Engine {
 
-    constructor(scene, renderer) {
-        super(scene, renderer);
+    constructor() {
+        super();
 
         this.objects = [];
 
@@ -14,7 +14,7 @@ class Main_Menu extends Engine {
         this.active = false;
         this.info_scene = new THREE.Scene();
         this.end_scene = new THREE.Scene();
-        this.saved_scene = scene;
+        this.saved_scene = this.scene;
     }
 
     start(ending){
@@ -22,10 +22,14 @@ class Main_Menu extends Engine {
         this.setupScene();
 
         this.setupInfoScene();
-        if(ending === "winner" || ending === "loser"){
-            this.setupEndScene(ending);
-        }
+        this.setupEndScene(ending);
         this.menuObjects();
+        console.log(ending);
+        if(ending === "winner" || ending === "loser"){
+            console.log("trigg");
+            this.saved_scene = this.scene;
+            this.scene = this.end_scene;
+        }
         this.animate();
     }
 
@@ -87,13 +91,10 @@ class Main_Menu extends Engine {
         infoBoard.translateY(250);
         this.end_scene.add(infoBoard);
 
-        let back_opt = this.createOption("Back");
+        let back_opt = this.createOption("Return");
         back_opt.translateY(150);
         this.end_scene.add(back_opt);
         this.objects.push(back_opt);
-
-        this.saved_scene = this.scene;
-        this.scene = this.end_scene;
     }
 
     menuObjects(){
@@ -181,6 +182,7 @@ class Main_Menu extends Engine {
             let textMesh = new THREE.Mesh(textGeo, mat);
             textMesh.name = "text:" + text;
             textMesh.translateX(-2);
+            textMesh.translateZ(2);
             textMesh.scale.x = 3;
             textMesh.scale.y = 3;
             textMesh.castShadow = true;
@@ -243,18 +245,17 @@ class Main_Menu extends Engine {
                 let opt = intersects[0].object.name.split(":")[1];
                 switch (opt) {
                     case "Start":
-                        super.setState(this.STATE_GAME);
                         this.active = false;
                         this.scene.getObjectByName("music").stop();
                         console.log(opt);
                         this.clearThree(this.scene);
-                        new Level(new THREE.Scene(), this.renderer).start(1);
+                        new Level().start(1);
                         break;
                     case "Options":
                         console.log(opt);
                         break;
                     case "Info":
-                        this.saved_scene = scene;
+                        this.saved_scene = this.scene;
                         this.scene.getObjectByName("music").stop();
                         this.scene = this.info_scene;
                         console.log(opt);
@@ -264,6 +265,9 @@ class Main_Menu extends Engine {
                         this.scene.getObjectByName("music").play();
                         console.log(opt);
                         break;
+                    case "Return":
+                        // Hindre memory leak
+                        location.reload();
                 }
             }
         }
@@ -276,7 +280,8 @@ class Main_Menu extends Engine {
     }
 
     clearThree(obj) {
-        this.objects = null;
+        this.objects = [];
         super.clearThree(obj);
+
     }
 }

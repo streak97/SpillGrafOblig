@@ -5,8 +5,8 @@
 class Level extends Engine {
     //TODO: Collision detection(points)
 
-    constructor(scene, renderer) {
-        super(scene, renderer);
+    constructor() {
+        super();
         // Player
         this.player = null;
         this.terranLoaded = false;
@@ -56,11 +56,11 @@ class Level extends Engine {
 
         this.player.create();
 
-        let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(new THREE.Vector3(50, 250, 20));
-        directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
-        directionalLight.castShadow = true;
-        this.scene.add(directionalLight);
+        // let directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        // directionalLight.position.set(new THREE.Vector3(50, 250, 20));
+        // directionalLight.target.position.set(new THREE.Vector3(0, 200, 0));
+        // directionalLight.castShadow = true;
+        // this.scene.add(directionalLight);
 
         let ambientLight = new THREE.AmbientLight("#CCCCCC");
         this.scene.add(ambientLight);
@@ -82,8 +82,16 @@ class Level extends Engine {
             }
 
             cone.position.set(val.x*10, val.y*10, val.z*10);
-            // cone.translateY(val.y*10);
-            // cone.translateZ(val.z*10);
+
+            let mesh = this._cannon.visuals[cone.index];
+
+            cone.position.copy(mesh.position);
+
+            if (cone.quaternion) {
+                cone.quaternion.copy(mesh.quaternion)
+            }
+
+            mesh.translateY(60);
 
         }
 
@@ -186,18 +194,24 @@ class Level extends Engine {
     animate(elapsed) {
         if(this.player.ended === true){
             this.clearThree(this.scene);
-            new Main_Menu(new THREE.Scene(), this.renderer).start(this.player.endType);
+            console.log(this.player.endType);
+            new Main_Menu().start(this.player.endType);
             return;
         }
         if (this.keys.F.isPressed) {
-            new Main_Menu(new THREE.Scene(), this.renderer).start();
+            new Main_Menu().start();
             return;
         }
+        let timeDelta = 0;
+        if (!(elapsed === undefined)) {
+            timeDelta = elapsed / 1000;
+        }
+
 
         requestAnimationFrame(this.animate.bind(this));
 
         if (this.terranLoaded) {
-            this._cannon.updatePhysics();
+            this._cannon.updatePhysics(timeDelta);
 
             this.player.update();
             this.updateCamera();
@@ -236,9 +250,11 @@ class Level extends Engine {
             new THREE.MeshLambertMaterial({map: top, side: THREE.DoubleSide}),
         ];
 
-        let platformGeo = new THREE.ConeBufferGeometry(5 * 10, 5 * 25, 5 * 12);
+        let platformGeo = new THREE.ConeBufferGeometry(5 * 10, 5 * 25, 12);
 
-        let halfextents = this.createCannonHalfExtents(platformGeo);
+        let hitbox = new THREE.CylinderBufferGeometry(50, 50, 1, 8);
+
+        let halfextents = this.createCannonHalfExtents(hitbox);
 
         let platformMesh = new THREE.Mesh(platformGeo, matArr);
         let shape = new CANNON.Box(halfextents);
@@ -260,7 +276,7 @@ class Level extends Engine {
             rigidBody.platType = "coin";
             platformMesh.add(this.addCoin(name));
         }
-        let mesh = this._cannon.addVisual(rigidBody, null, platformMesh);
+        this._cannon.addVisual(rigidBody, null, platformMesh);
         rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0), Math.PI);
         return rigidBody;
 
