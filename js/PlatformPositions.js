@@ -32,7 +32,7 @@ function setPlatformPositions(){
         },
         {
             x: -40,
-            y: -10,
+            y: -5,
             z: 15,
             haz: false
         },
