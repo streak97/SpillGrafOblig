@@ -3,7 +3,6 @@
  *  Sets up manages the logic og the playable level
  */
 class Level extends Engine {
-    //TODO: Collision detection(points)
 
     constructor(scene, renderer) {
         Physijs.scripts.worker = './lib/physijs_worker.js';
