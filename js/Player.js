@@ -18,6 +18,10 @@ Player = function () {
                 75,
             size:
                 0,
+            ended:
+                false,
+            endType:
+                "looser",
 
             // HingeConstraint to limit player's air-twisting
             orientationConstraint:
@@ -142,6 +146,7 @@ Player = function () {
                 player.processUserInput();
                 player.accelerate();
                 player.rotate();
+                player.event();
                 //player.updateCamera();
 
                 // Level logikk
@@ -243,6 +248,39 @@ Player = function () {
                     player.isGrounded = false;
                     player.rigidBody.velocity.y = player.jumpHeight;
                 }
+            },
+            event: function (){
+                // Sjekker platformer
+                if ( player.isGrounded ){
+
+                    let cIndex = player.level._cannon.getCollided(player.rigidBody.index);
+
+                    if(player.level._cannon.bodies[cIndex].platType === "fire"){
+                        player.level.hp -= 40;
+
+                        player.level._cannon.visuals[cIndex].remove(player.level._cannon.visuals[cIndex].children[0]);
+
+                        player.level._cannon.bodies[cIndex].platType = "";
+
+                        if(player.level.hp <= 0){
+                            player.level._cannon.removeAllVisuals();
+                            player.ended = true;
+                        }
+                    }
+                    if(player.level._cannon.bodies[cIndex].platType === "coin"){
+                        player.level.score += 1;
+                        player.level.updateScore();
+
+                        player.level._cannon.visuals[cIndex].remove(player.level._cannon.visuals[cIndex].children[0]);
+
+                        player.level._cannon.bodies[cIndex].platType = "";
+
+                        if(player.level.score > 4){
+                            player.ended = true;
+                            player.endType = "winner";
+                        }
+                    }
+                }
             }
             ,
             updateOrientation: function () {
@@ -261,8 +299,7 @@ Player = function () {
                 // Avslutter spillet om spiller har falt ned fra platform
                 if (player.mesh.position.y <= -80) {
                     player.level._cannon.removeAllVisuals();
-                    //new Main_Menu(new THREE.Scene(), player.level.renderer).start("looser");
-                    game.play();
+                    player.ended = true;
                 }
             }
         };

@@ -64,8 +64,6 @@ class Level extends Engine {
         this.addTerrain();
         this.setUpPlatforms();
 
-        //animationtesting
-        //setInterval(this.animateFire.bind(this), 100);
         this.animate();
     }
 
@@ -173,16 +171,6 @@ class Level extends Engine {
         getHeightData("textures/heightmap2.png", 512, 1024, this.terrainHeightLoaded.bind(this));
     }
 
-    // clearThree(obj){
-    //     while(obj.children.length > 0){
-    //         this.clearThree(obj.children[0]);
-    //         obj.remove(obj.children[0]);
-    //     }
-    //     if(obj.geometry) obj.geometry.dispose();
-    //     if(obj.material) obj.material.dispose();
-    //     if(obj.texture) obj.texture.dispose();
-    // }
-
     setUpSkybox(scene, renderer, camera, skybox) {
         let skyDir = "./textures/skybox" + skybox + "/";
 
@@ -210,10 +198,15 @@ class Level extends Engine {
 
 
     animate(elapsed) {
+        if(this.player.ended === true){
+            new Main_Menu(new THREE.Scene(), this.renderer).start(this.player.endType);
+            return;
+        }
         if (this.keys.F.isPressed) {
             new Main_Menu(new THREE.Scene(), this.renderer).start();
             return;
         }
+
         requestAnimationFrame(this.animate.bind(this));
 
         if (this.terranLoaded) {
@@ -271,10 +264,13 @@ class Level extends Engine {
         platformMesh.name = "cone:" + name;
         platformMesh.castShadow = true;
         platformMesh.receiveShadow = true;
+        rigidBody.platType = "";
 
         if (hazard === true) {
+            rigidBody.platType = "fire";
             platformMesh.add(this.addHazard(name));
         } else if(hazard === false){
+            rigidBody.platType = "coin";
             platformMesh.add(this.addCoin(name));
         }
         let mesh = this._cannon.addVisual(rigidBody, null, platformMesh);
@@ -293,7 +289,7 @@ class Level extends Engine {
 
         coin.name = "hazard:" + name;
         coin.scale.set(10, 10, 10);
-        coin.position.set(-25, -100, 0);
+        coin.position.set(0, -100, 0);
         coin.updateMatrix();
 
         return coin;
@@ -315,7 +311,7 @@ class Level extends Engine {
         let haz = new THREE.Sprite(matSprite);
         haz.name = "haz:" + name;
         haz.scale.set(50, 50, 50);
-        haz.position.set(-25, -100, 0);
+        haz.position.set(0, -100, 0);
         haz.updateMatrix();
         this.fires.push(spriteTex);
 
