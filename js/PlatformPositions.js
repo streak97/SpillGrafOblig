@@ -10,7 +10,7 @@ function setPlatformPositions(){
             x: 0,
             y: 0,
             z: 0,
-            haz: null
+            haz: null //Start platform
         },
         {
             x: 20,
@@ -29,6 +29,36 @@ function setPlatformPositions(){
             y: 4,
             z: 5,
             haz: false
+        },
+        {
+            x: -40,
+            y: -10,
+            z: 20,
+            haz: false
+        },
+        {
+            x: -60,
+            y: 0,
+            z: 40,
+            haz: false
+        },
+        {
+            x: 0,
+            y: 10,
+            z: 10,
+            haz: false
+        },
+        {
+            x: 10,
+            y: 20,
+            z: 0,
+            haz: true
+        },
+        {
+            x: 0,
+            y: 0,
+            z: -20,
+            haz: true
         },
     ];
 }

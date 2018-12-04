@@ -251,9 +251,9 @@ Player = function () {
             },
             event: function (){
                 // Sjekker platformer
-                if ( player.isGrounded ){
+                if (player.level._cannon.getCollisions(player.rigidBody.index) && player.isGrounded){
 
-                    let cIndex = player.level._cannon.getCollided(player.rigidBody.index);
+                    let cIndex = player.level._cannon.getCollided(0);
 
                     if(player.level._cannon.bodies[cIndex].platType === "fire"){
                         player.level.hp -= 40;
