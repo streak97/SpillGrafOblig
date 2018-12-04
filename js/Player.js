@@ -236,7 +236,7 @@ Player = function () {
                 }
             },
             event: function (){
-                // Sjekker platformer
+                // Sjekker platformer for hendelser
                 if (player.level._cannon.getCollisions(player.rigidBody.index) && player.isGrounded){
 
                     let cIndex = player.level._cannon.getCollided(0);
