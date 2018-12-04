@@ -96,6 +96,9 @@ class Level extends Engine {
 
             let val = this.plat_pos[i];
             let cone = this.createCone(i, val.haz);
+            if(val.haz === false){
+                this.max_score += 1;
+            }
 
             cone.position.set(val.x*10, val.y*10, val.z*10);
             // cone.translateY(val.y*10);

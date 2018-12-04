@@ -33,25 +33,25 @@ function setPlatformPositions(){
         {
             x: -40,
             y: -10,
-            z: 20,
+            z: 15,
             haz: false
         },
         {
             x: -60,
             y: 0,
-            z: 40,
+            z: 30,
             haz: false
         },
         {
             x: 0,
-            y: 10,
+            y: 6,
             z: 10,
             haz: false
         },
         {
             x: 10,
-            y: 20,
-            z: 0,
+            y: 12,
+            z: 5,
             haz: true
         },
         {

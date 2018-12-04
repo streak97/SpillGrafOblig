@@ -275,7 +275,7 @@ Player = function () {
 
                         player.level._cannon.bodies[cIndex].platType = "";
 
-                        if(player.level.score > 4){
+                        if(player.level.score > player.level.max_score - 1){
                             player.ended = true;
                             player.endType = "winner";
                         }

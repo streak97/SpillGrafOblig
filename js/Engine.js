@@ -21,6 +21,7 @@ class Engine{
 
         this.hp = 100;
         this.score = 0;
+        this.max_score = 0;
 
         this.camera = null;
         this.mouse = new THREE.Vector2();
