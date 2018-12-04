@@ -31,6 +31,7 @@ class Level extends Engine {
         this.plat_pos = [];
     }
 
+    //Starts level setup
     start(level) {
         this.player = Player();
         this.player.level = this;
@@ -47,6 +48,7 @@ class Level extends Engine {
         this.animate();
     }
 
+    //Sets up scene elements
     setUpScene() {
         // CAMERA
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
@@ -71,6 +73,7 @@ class Level extends Engine {
         window.addEventListener('keyup', this.onKeyUp.bind(this), false);
     }
 
+    //Creates platforms from PlatformPositions.js
     setUpPlatforms() {
         for (let i = 0; i < this.plat_pos.length; i++) {
 
@@ -88,6 +91,7 @@ class Level extends Engine {
 
     }
 
+    //Detects key input
     onKeyDown(event) {
         for (let k in this.keys) {
 
@@ -98,6 +102,7 @@ class Level extends Engine {
         }
     }
 
+    //Detects key input
     onKeyUp(event) {
         for (let k in this.keys) {
 
@@ -108,6 +113,7 @@ class Level extends Engine {
         }
     }
 
+    //Creates terrain map
     terrainHeightLoaded(data) {
         this.terrainGeo = new THREE.PlaneGeometry(2048, 2048, 511, 511);
 
@@ -147,15 +153,18 @@ class Level extends Engine {
         this.terranLoaded = true;
     }
 
+    //Starts height map loading
     addTerrain() {
         getHeightData("textures/heightmap2.png", 512, 1024, this.terrainHeightLoaded.bind(this));
     }
 
+    //Clears three objects
     clearThree(obj){
         this._cannon.destroy();
         super.clearThree(obj)
     }
 
+    //Adds skybox
     setUpSkybox(scene, renderer, camera, skybox) {
         let skyDir = "./textures/skybox" + skybox + "/";
 
@@ -181,7 +190,7 @@ class Level extends Engine {
                 });
     }
 
-
+    //Animates gameplay
     animate(elapsed) {
         if(this.player.ended === true){
             this.clearThree(this.scene);
@@ -207,10 +216,12 @@ class Level extends Engine {
         }
     }
 
+    //Render caller
     render() {
         super.render();
     }
 
+    //Updates camera position and direction
     updateCamera() {
         this.player.cameraCoords = this._helpers.polarToCartesian(this.player.cameraOffsetH, this.player.rotationRadians.y);
 
@@ -221,6 +232,7 @@ class Level extends Engine {
         this.camera.lookAt(this.player.mesh.position);
     }
 
+    //Creates a cone mesh
     createCone(name, hazard) {
         let texLoader = new THREE.TextureLoader();
         let top = texLoader.load("textures/platform_top_texture.png");
@@ -265,6 +277,7 @@ class Level extends Engine {
 
     }
 
+    //Returns a coin sprite
     addCoin(name) {
         let texLoader = new THREE.TextureLoader();
 
@@ -281,6 +294,7 @@ class Level extends Engine {
         return coin;
     }
 
+    //Returns a fire sprite
     addHazard(name) {
         let texLoader = new THREE.TextureLoader();
 
@@ -304,6 +318,7 @@ class Level extends Engine {
         return haz;
     }
 
+    //Animates fire sprites with keyframes
     animateFire() {
         for (let i = 0; i < this.fires.length; i++) {
 
@@ -320,6 +335,7 @@ class Level extends Engine {
         }
     }
 
+    //Handles window resize
     onWindowResize() {
 
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -343,6 +359,7 @@ class Level extends Engine {
         );
     }
 
+    //Creates geometry for connon.js
     createCannonGeometry(geometry, scale) {
         // Preparre translation properties
         var translateX;
